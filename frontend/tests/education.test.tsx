@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { api } from '@/lib/api';
@@ -33,7 +33,7 @@ describe('Edtech counselling workflow', () => {
   it('books a demo with an idempotency key and shows staff-only reminder wording', async () => {
     vi.mocked(api).mockImplementation(async (_path, options) => options?.method ? {} : paged([{ id: 'lead', title: 'Python', contact_name: 'Student', can_edit: true, status: 'new' }]));
     const close = vi.fn(); wrap(<DemoBookingForm onClose={close} />); const user = userEvent.setup();
-    await screen.findByRole('option', { name: 'Student · Python' });
+    await within(screen.getByLabelText('Student enquiry')).findByRole('option', { name: 'Student · Python' }, { timeout: 3000 });
     await user.selectOptions(screen.getByLabelText('Student enquiry'), 'lead');
     await user.type(screen.getByLabelText('Campus / classroom'), 'Marathahalli room 1');
     await user.type(screen.getByLabelText('Demo time (your local time)'), '2026-12-01T10:00');

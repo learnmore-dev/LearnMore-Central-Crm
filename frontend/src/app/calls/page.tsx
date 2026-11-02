@@ -1,4 +1,5 @@
 'use client';
+import { CourseField } from '@/components/course-field';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useRef, useState, type FormEvent } from 'react';
@@ -49,7 +50,7 @@ function EnquiryForm({ call, onClose }: { call: Call; onClose: () => void }) {
     onSuccess: () => { void client.invalidateQueries({ predicate: q => q.queryKey[0] !== 'session' }); onClose(); } });
   return <form className="form-stack" onSubmit={e => { e.preventDefault(); create.mutate(); }}>
     <p><strong>{call.contact_name}</strong> · {call.caller_phone}</p>
-    <Field title="Enquiry title / course"><input required maxLength={200} value={title} onChange={e => setTitle(e.target.value)} /></Field>
+    <CourseField title="Enquiry title / course" required value={title} onChange={setTitle} />
     <div className="notice">This enquiry will use {call.branch_name} and the branch’s counsellor routing. The call remains linked to the contact and enquiry.</div>
     <FormError error={create.error} /><button className="button primary" disabled={!title.trim() || create.isPending}>{create.isPending ? 'Creating…' : 'Create enquiry'}</button>
   </form>;

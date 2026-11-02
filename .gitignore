@@ -29,3 +29,4 @@ coverage/
 .DS_Store
 # Separate website checkout has its own repository and release process.
 /websites/
+/var/

@@ -4,6 +4,7 @@ CRM for LearnMore Technologies. **Milestones 1–5:** Django/DRF APIs and a resp
 
 - [Windows setup](docs/WINDOWS_SETUP.md)
 - [Run the current local workspace](docs/LOCAL_RUNNING.md)
+- [Ubuntu production deployment](deploy/ubuntu/README.md)
 - [Architecture and milestones](docs/IMPLEMENTATION_PLAN.md)
 - [Verification record](docs/VERIFICATION.md)
 - [Milestone 2 API and identity workflow](docs/MILESTONE_2.md)

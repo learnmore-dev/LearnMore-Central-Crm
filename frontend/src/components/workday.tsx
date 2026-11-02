@@ -1,0 +1,21 @@
+'use client';
+import Link from 'next/link';
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { ArrowUpRight, CalendarDays, RefreshCw } from 'lucide-react';
+import { api, queryPath } from '@/lib/api';
+import { date, label } from '@/lib/format';
+import { useUser } from './providers';
+import { Badge, Empty, ErrorState, Loading, PageHeader, Pagination } from './ui';
+import { FollowUpReport } from './follow-up-report';
+type Workday = { server_time: string; counts: Record<string, number>; count: number; has_next: boolean; results: { id: string; origin: string; kind: string; name: string; title: string; due_at: string; status: string; target: string }[] };
+export function Workday() {
+  const user = useUser(); const [period, setPeriod] = useState('due'); const [kind, setKind] = useState(''); const [page, setPage] = useState(1);
+  const path = queryPath('/education/workday/', { period, kind, page });
+  const result = useQuery({ queryKey: ['workday', path], queryFn: ({ signal }) => api<Workday>(path, { signal }), refetchInterval: 30_000, enabled: user.capabilities.sales_write });
+  if (!user.capabilities.sales_write) return <Empty title="Sales access required" />;
+  return <><PageHeader eyebrow="EVERY LEARNER. A NEXT STEP." title="My work today" description="Your follow-ups, callbacks, demo reminders and unanswered conversations in one place.">{(user.capabilities.global_scope || user.role === 'branch_manager') && <Link href="/reports/follow-ups" className="button secondary">Team report <ArrowUpRight size={15} /></Link>}<button className="button primary" disabled={result.isFetching} onClick={() => void result.refetch()}><RefreshCw size={15} /> Refresh</button></PageHeader>
+    {result.isPending ? <Loading /> : result.error ? <ErrorState error={result.error} retry={() => void result.refetch()} /> : result.data && <><div className="reminder-metrics">{[['today', 'Due today'], ['overdue', 'Overdue now'], ['upcoming', 'From tomorrow'], ['all', 'All open work']].map(([key, title]) => <button className={`reminder-metric ${period === key ? 'selected' : ''}`} key={key} onClick={() => { setPeriod(key); setPage(1); }}><span className={`metric-icon ${key === 'overdue' ? 'rose' : 'mint'}`}><CalendarDays size={18} /></span><strong>{result.data!.counts[key] || 0}</strong><span>{title}</span><small>View work <ArrowUpRight size={12} /></small></button>)}</div><section className="panel"><div className="panel-toolbar"><div><h2>Your reminder queue</h2><p className="small-text muted">Refreshes every 30 seconds · Today includes overdue work due today · Times in IST</p></div><div className="filter-group"><select aria-label="Work period" value={period} onChange={e => { setPeriod(e.target.value); setPage(1); }}>{[['due', 'Due through today'], ['today', 'Today'], ['overdue', 'Overdue'], ['upcoming', 'From tomorrow'], ['all', 'All open work']].map(([key, title]) => <option key={key} value={key}>{title}</option>)}</select><select aria-label="Work type" value={kind} onChange={e => { setKind(e.target.value); setPage(1); }}><option value="">All work types</option>{[['followup', 'Follow-ups & assignments'], ['automation', 'Automation callbacks'], ['demo', 'Demo tasks'], ['appointment', 'Appointments'], ['reply', 'WhatsApp replies']].map(([key, title]) => <option key={key} value={key}>{title}</option>)}</select></div></div>{result.data.results.length ? <div className="table-wrap"><table><thead><tr><th>Student</th><th>Required action</th><th>Type</th><th>Due (IST)</th><th>Status</th><th>Next step</th></tr></thead><tbody>{result.data.results.map(r => <tr key={`${r.origin}:${r.id}`}><td><strong>{r.name}</strong></td><td className="report-wrap">{r.title}</td><td>{label(r.origin)}<small className="cell-line muted">{label(r.kind)}</small></td><td>{date(r.due_at)}</td><td><Badge value={new Date(r.due_at) < new Date(result.data!.server_time) ? 'overdue' : r.status} /></td><td><Link className="button secondary small" href={r.target}>Open workspace <ArrowUpRight size={14} /></Link></td></tr>)}</tbody></table></div> : <Empty title="Nothing waiting in this view">Try another work type or period.</Empty>}<Pagination count={result.data.count} page={page} previous={page > 1} next={result.data.has_next} onPage={setPage} /></section></>}
+    <FollowUpReport embedded />
+  </>;
+}

@@ -1,0 +1,10 @@
+Django>=5.2.8,<5.3
+djangorestframework>=3.16,<3.17
+psycopg[binary]>=3.2,<3.4
+django-cors-headers>=4.7,<5
+drf-spectacular>=0.28,<0.30
+python-dotenv>=1.1,<2
+phonenumbers>=9,<10
+celery[redis]>=5.6,<5.7
+cryptography>=46,<47
+gunicorn>=23,<24; sys_platform != 'win32'

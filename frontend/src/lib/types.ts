@@ -1,0 +1,16 @@
+export type Role = 'super_admin' | 'management' | 'branch_manager' | 'counsellor' | 'intern' | 'accounts' | 'support';
+export type Profile = { id: string; username: string; first_name: string; last_name: string; email: string; role: Role; branch: string | null; capabilities: { manage_users?: boolean; global_scope: boolean; manage_branches: boolean; sales_write: boolean; manage_routing: boolean } };
+export type Page<T> = { count: number; next: string | null; previous: string | null; results: T[] };
+export type Branch = { id: string; name: string; code: string; address: string; is_active: boolean; created_at: string };
+export type Identifier = { id: string; kind: 'phone' | 'email' | 'external'; value: string; normalized_value: string; namespace: string };
+export type Contact = { first_enquiry_at?: string | null; id: string; contact_id: string; full_name: string; branch: string; branch_name: string; source: string; identifier_records: Identifier[]; created_at: string; can_edit: boolean };
+export const statuses = ['new', 'contacted', 'qualified', 'won', 'lost'] as const;
+export type LeadStatus = (typeof statuses)[number];
+export type Lead = { origin_branch?: string | null; origin_branch_name?: string | null; origin_branch_code?: string; origin_branch_verified?: boolean; received_at?: string; received_via?: string; created_at?: string; id: string; lead_id: string; contact: string; contact_name: string; branch: string; branch_name: string; owner: string | null; owner_name: string | null; title: string; source: string; status: LeadStatus; next_action: string; next_action_at: string | null; no_followup_reason: string; unassigned_reason: string; acknowledgement_due_at: string | null; acknowledged_at: string | null; assignment_version: number; can_edit: boolean };
+export type Activity = { id: string; contact: string; contact_name: string; lead: string | null; branch: string; branch_name: string; actor_name: string; kind: string; body: string; created_at: string };
+export type Counsellor = { id: number; user: string; user_name: string; branch: string; user_active: boolean; is_available: boolean; can_receive_leads: boolean; max_active_leads: number; workload: number };
+export type Employee = { id: string; display_name: string; branch: string; role: Role; is_active: boolean; routing_profile_id: number | null };
+export type Assignment = { id: string; lead: string; lead_label: string; branch: string; branch_name: string; previous_owner_name: string | null; new_owner_name: string | null; actor_name: string; reason: string; status: string; version: number; created_at: string };
+export type Task = { id: string; lead: string; branch: string; kind: string; title: string; assignee: string | null; status: string; due_at: string; resolution: string; overdue: boolean };
+export type Review = { id: string; full_name: string; status: string; candidate_contacts: string[]; resolved_contact: string | null; target_contact: string | null; reason: string };
+export type Dashboard = { contacts: number; active_leads: number; unassigned: number; overdue_tasks: number; available_counsellors: number; pipeline: Record<LeadStatus, number>; branches: { id: string; name: string; is_active: boolean; active_leads: number; unassigned: number }[]; recent_activities: Activity[] };

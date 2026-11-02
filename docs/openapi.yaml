@@ -1,0 +1,6385 @@
+openapi: 3.0.3
+info:
+  title: LearnMore Connect API
+  version: 1.0.0
+paths:
+  /api/v1/activities/:
+    get:
+      operationId: activities_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - activities
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedActivityList'
+          description: ''
+    post:
+      operationId: activities_create
+      tags:
+      - activities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Activity'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Activity'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Activity'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Activity'
+          description: ''
+  /api/v1/activities/{id}/:
+    get:
+      operationId: activities_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this activity.
+        required: true
+      tags:
+      - activities
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Activity'
+          description: ''
+  /api/v1/assignment-history/:
+    get:
+      operationId: assignment_history_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - assignment-history
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedHistoryList'
+          description: ''
+  /api/v1/assignment-history/{id}/:
+    get:
+      operationId: assignment_history_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this assignment history.
+        required: true
+      tags:
+      - assignment-history
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/History'
+          description: ''
+  /api/v1/auth/csrf/:
+    get:
+      operationId: auth_csrf_retrieve
+      tags:
+      - auth
+      security:
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CSRF'
+          description: ''
+  /api/v1/auth/login/:
+    post:
+      operationId: auth_login_create
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Login'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Login'
+        required: true
+      security:
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+          description: ''
+  /api/v1/auth/logout/:
+    post:
+      operationId: auth_logout_create
+      tags:
+      - auth
+      security:
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/auth/me/:
+    get:
+      operationId: auth_me_retrieve
+      tags:
+      - auth
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+          description: ''
+  /api/v1/automation/audit/:
+    get:
+      operationId: automation_audit_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - automation
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedEventList'
+          description: ''
+  /api/v1/automation/audit/{id}/:
+    get:
+      operationId: automation_audit_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this automation event.
+        required: true
+      tags:
+      - automation
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+          description: ''
+  /api/v1/automation/rules/:
+    get:
+      operationId: automation_rules_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - automation
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedRuleList'
+          description: ''
+    post:
+      operationId: automation_rules_create
+      tags:
+      - automation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Rule'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Rule'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Rule'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rule'
+          description: ''
+  /api/v1/automation/rules/{id}/:
+    get:
+      operationId: automation_rules_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this automation rule.
+        required: true
+      tags:
+      - automation
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rule'
+          description: ''
+    patch:
+      operationId: automation_rules_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this automation rule.
+        required: true
+      tags:
+      - automation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedRule'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedRule'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedRule'
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rule'
+          description: ''
+  /api/v1/automation/runs/:
+    get:
+      operationId: automation_runs_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - automation
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedRunList'
+          description: ''
+  /api/v1/automation/runs/{id}/:
+    get:
+      operationId: automation_runs_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this automation run.
+        required: true
+      tags:
+      - automation
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Run'
+          description: ''
+  /api/v1/automation/runs/{id}/control/:
+    post:
+      operationId: automation_runs_control_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this automation run.
+        required: true
+      tags:
+      - automation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ControlInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ControlInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ControlInput'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Run'
+          description: ''
+  /api/v1/automation/runs/enroll/:
+    post:
+      operationId: automation_runs_enroll_create
+      tags:
+      - automation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EnrollInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EnrollInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EnrollInput'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Run'
+          description: ''
+  /api/v1/automation/work/:
+    get:
+      operationId: automation_work_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - automation
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedWorkList'
+          description: ''
+  /api/v1/automation/work/{id}/:
+    get:
+      operationId: automation_work_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this automation task.
+        required: true
+      tags:
+      - automation
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Work'
+          description: ''
+  /api/v1/automation/work/{id}/complete/:
+    post:
+      operationId: automation_work_complete_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this automation task.
+        required: true
+      tags:
+      - automation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AutomationCompleteInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AutomationCompleteInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AutomationCompleteInput'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Work'
+          description: ''
+  /api/v1/branches/:
+    get:
+      operationId: branches_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - branches
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedBranchList'
+          description: ''
+    post:
+      operationId: branches_create
+      tags:
+      - branches
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Branch'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Branch'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Branch'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Branch'
+          description: ''
+  /api/v1/branches/{id}/:
+    get:
+      operationId: branches_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this branch.
+        required: true
+      tags:
+      - branches
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Branch'
+          description: ''
+    put:
+      operationId: branches_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this branch.
+        required: true
+      tags:
+      - branches
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Branch'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Branch'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Branch'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Branch'
+          description: ''
+    patch:
+      operationId: branches_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this branch.
+        required: true
+      tags:
+      - branches
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedBranch'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedBranch'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedBranch'
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Branch'
+          description: ''
+  /api/v1/call-logs/:
+    get:
+      operationId: call_logs_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - call-logs
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCallList'
+          description: ''
+    post:
+      operationId: call_logs_create
+      tags:
+      - call-logs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Call'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Call'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Call'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Call'
+          description: ''
+  /api/v1/call-logs/{id}/:
+    get:
+      operationId: call_logs_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this call log.
+        required: true
+      tags:
+      - call-logs
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Call'
+          description: ''
+  /api/v1/call-logs/{id}/create-enquiry/:
+    post:
+      operationId: call_logs_create_enquiry_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this call log.
+        required: true
+      tags:
+      - call-logs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EnquiryInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EnquiryInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EnquiryInput'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Call'
+          description: ''
+  /api/v1/call-logs/{id}/resolve-contact/:
+    post:
+      operationId: call_logs_resolve_contact_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this call log.
+        required: true
+      tags:
+      - call-logs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResolveInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ResolveInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ResolveInput'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Call'
+          description: ''
+  /api/v1/contact-identifiers/:
+    get:
+      operationId: contact_identifiers_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - contact-identifiers
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedIdentifierList'
+          description: ''
+    post:
+      operationId: contact_identifiers_create
+      tags:
+      - contact-identifiers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Identifier'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Identifier'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Identifier'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Identifier'
+          description: ''
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DuplicateReview'
+          description: ''
+  /api/v1/contact-identifiers/{id}/:
+    get:
+      operationId: contact_identifiers_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this contact identifier.
+        required: true
+      tags:
+      - contact-identifiers
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Identifier'
+          description: ''
+  /api/v1/contacts/:
+    get:
+      operationId: contacts_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - contacts
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedContactList'
+          description: ''
+    post:
+      operationId: contacts_create
+      tags:
+      - contacts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Contact'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Contact'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Contact'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contact'
+          description: ''
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DuplicateReview'
+          description: ''
+  /api/v1/contacts/{id}/:
+    get:
+      operationId: contacts_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this contact.
+        required: true
+      tags:
+      - contacts
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contact'
+          description: ''
+    put:
+      operationId: contacts_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this contact.
+        required: true
+      tags:
+      - contacts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Contact'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Contact'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Contact'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contact'
+          description: ''
+    patch:
+      operationId: contacts_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this contact.
+        required: true
+      tags:
+      - contacts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedContact'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedContact'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedContact'
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contact'
+          description: ''
+  /api/v1/contacts/match/:
+    post:
+      operationId: contacts_match_create
+      tags:
+      - contacts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Match'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Match'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Match'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MatchResult'
+          description: ''
+  /api/v1/counsellor-profiles/:
+    get:
+      operationId: counsellor_profiles_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - counsellor-profiles
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCounsellorProfileList'
+          description: ''
+    post:
+      operationId: counsellor_profiles_create
+      tags:
+      - counsellor-profiles
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CounsellorProfile'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CounsellorProfile'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CounsellorProfile'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CounsellorProfile'
+          description: ''
+  /api/v1/counsellor-profiles/{id}/:
+    get:
+      operationId: counsellor_profiles_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this counsellor profile.
+        required: true
+      tags:
+      - counsellor-profiles
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CounsellorProfile'
+          description: ''
+    put:
+      operationId: counsellor_profiles_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this counsellor profile.
+        required: true
+      tags:
+      - counsellor-profiles
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CounsellorProfile'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CounsellorProfile'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CounsellorProfile'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CounsellorProfile'
+          description: ''
+    patch:
+      operationId: counsellor_profiles_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this counsellor profile.
+        required: true
+      tags:
+      - counsellor-profiles
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCounsellorProfile'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCounsellorProfile'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCounsellorProfile'
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CounsellorProfile'
+          description: ''
+  /api/v1/dashboard/:
+    get:
+      operationId: dashboard_retrieve
+      parameters:
+      - in: query
+        name: branch
+        schema:
+          type: string
+      tags:
+      - dashboard
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dashboard'
+          description: ''
+  /api/v1/duplicate-reviews/:
+    get:
+      operationId: duplicate_reviews_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - duplicate-reviews
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedDuplicateReviewList'
+          description: ''
+  /api/v1/duplicate-reviews/{id}/:
+    get:
+      operationId: duplicate_reviews_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this duplicate review.
+        required: true
+      tags:
+      - duplicate-reviews
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DuplicateReview'
+          description: ''
+  /api/v1/duplicate-reviews/{id}/resolve/:
+    post:
+      operationId: duplicate_reviews_resolve_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this duplicate review.
+        required: true
+      tags:
+      - duplicate-reviews
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Resolve'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Resolve'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Resolve'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DuplicateReview'
+          description: ''
+  /api/v1/education/attention/:
+    get:
+      operationId: education_attention_retrieve
+      parameters:
+      - in: query
+        name: branch
+        schema:
+          type: string
+      tags:
+      - education
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Attention'
+          description: ''
+  /api/v1/education/demos/:
+    get:
+      operationId: education_demos_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - education
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedDemoList'
+          description: ''
+    post:
+      operationId: education_demos_create
+      tags:
+      - education
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Demo'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Demo'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Demo'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Demo'
+          description: ''
+  /api/v1/education/demos/{id}/:
+    get:
+      operationId: education_demos_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this demo.
+        required: true
+      tags:
+      - education
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Demo'
+          description: ''
+  /api/v1/education/demos/{id}/change/:
+    post:
+      operationId: education_demos_change_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this demo.
+        required: true
+      tags:
+      - education
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DemoChangeInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DemoChangeInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DemoChangeInput'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Demo'
+          description: ''
+  /api/v1/education/qualifications/{lead_id}/:
+    get:
+      operationId: education_qualifications_retrieve
+      parameters:
+      - in: path
+        name: lead_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - education
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qualification'
+          description: ''
+    patch:
+      operationId: education_qualifications_partial_update
+      parameters:
+      - in: path
+        name: lead_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - education
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedQualification'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedQualification'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedQualification'
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Qualification'
+          description: ''
+  /api/v1/education/tasks/:
+    get:
+      operationId: education_tasks_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - education
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedDemoTaskList'
+          description: ''
+  /api/v1/education/tasks/{id}/:
+    get:
+      operationId: education_tasks_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this demo task.
+        required: true
+      tags:
+      - education
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DemoTask'
+          description: ''
+  /api/v1/education/tasks/{id}/complete/:
+    post:
+      operationId: education_tasks_complete_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this demo task.
+        required: true
+      tags:
+      - education
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DemoTaskCompleteInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DemoTaskCompleteInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DemoTaskCompleteInput'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DemoTask'
+          description: ''
+  /api/v1/employees/:
+    get:
+      operationId: employees_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - employees
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedEmployeeList'
+          description: ''
+  /api/v1/enquiry-dashboard/:
+    get:
+      operationId: enquiry_dashboard_retrieve
+      parameters:
+      - in: query
+        name: branch
+        schema:
+          type: string
+      - in: query
+        name: page
+        schema:
+          type: string
+      - in: query
+        name: period
+        schema:
+          type: string
+      - in: query
+        name: search
+        schema:
+          type: string
+      - in: query
+        name: source
+        schema:
+          type: string
+      - in: query
+        name: status
+        schema:
+          type: string
+      tags:
+      - enquiry-dashboard
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Feed'
+          description: ''
+  /api/v1/follow-up-tasks/:
+    get:
+      operationId: follow_up_tasks_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - follow-up-tasks
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTaskList'
+          description: ''
+    post:
+      operationId: follow_up_tasks_create
+      tags:
+      - follow-up-tasks
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Task'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Task'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Task'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+          description: ''
+  /api/v1/follow-up-tasks/{id}/:
+    get:
+      operationId: follow_up_tasks_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this follow up task.
+        required: true
+      tags:
+      - follow-up-tasks
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+          description: ''
+  /api/v1/follow-up-tasks/{id}/complete/:
+    post:
+      operationId: follow_up_tasks_complete_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this follow up task.
+        required: true
+      tags:
+      - follow-up-tasks
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompleteInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CompleteInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CompleteInput'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+          description: ''
+  /api/v1/intake/websites/{site}/:
+    post:
+      operationId: intake_websites_create
+      parameters:
+      - in: path
+        name: site
+        schema:
+          type: string
+        required: true
+      tags:
+      - intake
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubmissionInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SubmissionInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SubmissionInput'
+        required: true
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Receipt'
+          description: ''
+  /api/v1/leads/:
+    get:
+      operationId: leads_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - leads
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedLeadList'
+          description: ''
+    post:
+      operationId: leads_create
+      tags:
+      - leads
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Lead'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Lead'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Lead'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lead'
+          description: ''
+  /api/v1/leads/{id}/:
+    get:
+      operationId: leads_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this lead.
+        required: true
+      tags:
+      - leads
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lead'
+          description: ''
+    put:
+      operationId: leads_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this lead.
+        required: true
+      tags:
+      - leads
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Lead'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Lead'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Lead'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lead'
+          description: ''
+    patch:
+      operationId: leads_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this lead.
+        required: true
+      tags:
+      - leads
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedLead'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedLead'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedLead'
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lead'
+          description: ''
+  /api/v1/routing-policies/:
+    get:
+      operationId: routing_policies_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - routing-policies
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPolicyList'
+          description: ''
+    post:
+      operationId: routing_policies_create
+      tags:
+      - routing-policies
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Policy'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Policy'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Policy'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Policy'
+          description: ''
+  /api/v1/routing-policies/{branch}/:
+    get:
+      operationId: routing_policies_retrieve
+      parameters:
+      - in: path
+        name: branch
+        schema:
+          type: string
+          format: uuid
+        description: A unique value identifying this routing policy.
+        required: true
+      tags:
+      - routing-policies
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Policy'
+          description: ''
+    put:
+      operationId: routing_policies_update
+      parameters:
+      - in: path
+        name: branch
+        schema:
+          type: string
+          format: uuid
+        description: A unique value identifying this routing policy.
+        required: true
+      tags:
+      - routing-policies
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Policy'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Policy'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Policy'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Policy'
+          description: ''
+    patch:
+      operationId: routing_policies_partial_update
+      parameters:
+      - in: path
+        name: branch
+        schema:
+          type: string
+          format: uuid
+        description: A unique value identifying this routing policy.
+        required: true
+      tags:
+      - routing-policies
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedPolicy'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedPolicy'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedPolicy'
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Policy'
+          description: ''
+  /api/v1/routing/acknowledge/:
+    post:
+      operationId: routing_acknowledge_create
+      tags:
+      - routing
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScopedLeadInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ScopedLeadInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ScopedLeadInput'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lead'
+          description: ''
+  /api/v1/routing/override/:
+    post:
+      operationId: routing_override_create
+      tags:
+      - routing
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OverrideInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OverrideInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OverrideInput'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lead'
+          description: ''
+  /api/v1/routing/route/:
+    post:
+      operationId: routing_route_create
+      tags:
+      - routing
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScopedLeadInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ScopedLeadInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ScopedLeadInput'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lead'
+          description: ''
+  /api/v1/routing/transfer/:
+    post:
+      operationId: routing_transfer_create
+      tags:
+      - routing
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TransferInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TransferInput'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lead'
+          description: ''
+  /api/v1/unassigned/:
+    get:
+      operationId: unassigned_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - unassigned
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedLeadList'
+          description: ''
+  /api/v1/unassigned/{id}/:
+    get:
+      operationId: unassigned_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this lead.
+        required: true
+      tags:
+      - unassigned
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lead'
+          description: ''
+  /api/v1/website-enquiries/:
+    get:
+      operationId: website_enquiries_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - website-enquiries
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSubmissionList'
+          description: ''
+  /api/v1/website-enquiries/{id}/:
+    get:
+      operationId: website_enquiries_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this website submission.
+        required: true
+      tags:
+      - website-enquiries
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Submission'
+          description: ''
+  /api/v1/website-enquiries/{id}/resolve/:
+    post:
+      operationId: website_enquiries_resolve_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this website submission.
+        required: true
+      tags:
+      - website-enquiries
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResolveInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ResolveInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ResolveInput'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Submission'
+          description: ''
+  /api/v1/whatsapp/ad-drafts/:
+    get:
+      operationId: whatsapp_ad_drafts_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - whatsapp
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAdList'
+          description: ''
+    post:
+      operationId: whatsapp_ad_drafts_create
+      tags:
+      - whatsapp
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Ad'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Ad'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Ad'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ad'
+          description: ''
+  /api/v1/whatsapp/campaigns/:
+    get:
+      operationId: whatsapp_campaigns_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - whatsapp
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCampaignList'
+          description: ''
+    post:
+      operationId: whatsapp_campaigns_create
+      tags:
+      - whatsapp
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Campaign'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Campaign'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Campaign'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Campaign'
+          description: ''
+  /api/v1/whatsapp/campaigns/{id}/:
+    get:
+      operationId: whatsapp_campaigns_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this campaign.
+        required: true
+      tags:
+      - whatsapp
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Campaign'
+          description: ''
+  /api/v1/whatsapp/campaigns/{id}/queue-mock/:
+    post:
+      operationId: whatsapp_campaigns_queue_mock_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this campaign.
+        required: true
+      tags:
+      - whatsapp
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Campaign'
+          description: ''
+  /api/v1/whatsapp/canned-messages/:
+    get:
+      operationId: whatsapp_canned_messages_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - whatsapp
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCannedList'
+          description: ''
+    post:
+      operationId: whatsapp_canned_messages_create
+      tags:
+      - whatsapp
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Canned'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Canned'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Canned'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Canned'
+          description: ''
+  /api/v1/whatsapp/canned-messages/{id}/:
+    put:
+      operationId: whatsapp_canned_messages_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this canned message.
+        required: true
+      tags:
+      - whatsapp
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Canned'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Canned'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Canned'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Canned'
+          description: ''
+    patch:
+      operationId: whatsapp_canned_messages_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this canned message.
+        required: true
+      tags:
+      - whatsapp
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCanned'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCanned'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCanned'
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Canned'
+          description: ''
+  /api/v1/whatsapp/channels/:
+    get:
+      operationId: whatsapp_channels_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - whatsapp
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedChannelList'
+          description: ''
+    post:
+      operationId: whatsapp_channels_create
+      tags:
+      - whatsapp
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Channel'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Channel'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Channel'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Channel'
+          description: ''
+  /api/v1/whatsapp/channels/{id}/:
+    put:
+      operationId: whatsapp_channels_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this channel.
+        required: true
+      tags:
+      - whatsapp
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Channel'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Channel'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Channel'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Channel'
+          description: ''
+    patch:
+      operationId: whatsapp_channels_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this channel.
+        required: true
+      tags:
+      - whatsapp
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedChannel'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedChannel'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedChannel'
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Channel'
+          description: ''
+  /api/v1/whatsapp/channels/{id}/mock-template/:
+    post:
+      operationId: whatsapp_channels_mock_template_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this channel.
+        required: true
+      tags:
+      - whatsapp
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MockTemplateResult'
+          description: ''
+  /api/v1/whatsapp/conversations/:
+    get:
+      operationId: whatsapp_conversations_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - whatsapp
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedConversationList'
+          description: ''
+    post:
+      operationId: whatsapp_conversations_create
+      tags:
+      - whatsapp
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConversationInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ConversationInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ConversationInput'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Conversation'
+          description: ''
+  /api/v1/whatsapp/conversations/{id}/:
+    get:
+      operationId: whatsapp_conversations_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this conversation.
+        required: true
+      tags:
+      - whatsapp
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Conversation'
+          description: ''
+  /api/v1/whatsapp/conversations/{id}/consent/:
+    post:
+      operationId: whatsapp_conversations_consent_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this conversation.
+        required: true
+      tags:
+      - whatsapp
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConsentInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ConsentInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ConsentInput'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Conversation'
+          description: ''
+  /api/v1/whatsapp/conversations/{id}/link/:
+    post:
+      operationId: whatsapp_conversations_link_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this conversation.
+        required: true
+      tags:
+      - whatsapp
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LinkInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LinkInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LinkInput'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Conversation'
+          description: ''
+  /api/v1/whatsapp/messages/:
+    get:
+      operationId: whatsapp_messages_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - whatsapp
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedMessageList'
+          description: ''
+    post:
+      operationId: whatsapp_messages_create
+      tags:
+      - whatsapp
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MessageInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MessageInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MessageInput'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+          description: ''
+  /api/v1/whatsapp/messages/{id}/:
+    get:
+      operationId: whatsapp_messages_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this message.
+        required: true
+      tags:
+      - whatsapp
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+          description: ''
+  /api/v1/whatsapp/settings/:
+    get:
+      operationId: whatsapp_settings_retrieve
+      tags:
+      - whatsapp
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Settings'
+          description: ''
+  /api/v1/whatsapp/templates/:
+    get:
+      operationId: whatsapp_templates_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - whatsapp
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTemplateList'
+          description: ''
+components:
+  schemas:
+    Activity:
+      type: object
+      description: Reject spoofed read-only/unknown fields instead of silently ignoring
+        them.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        contact:
+          type: string
+          format: uuid
+        lead:
+          type: string
+          format: uuid
+          nullable: true
+        branch:
+          type: string
+          format: uuid
+        actor:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+        kind:
+          allOf:
+          - $ref: '#/components/schemas/ActivityKindEnum'
+          readOnly: true
+        body:
+          type: string
+          maxLength: 4000
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        actor_name:
+          type: string
+          readOnly: true
+        contact_name:
+          type: string
+          readOnly: true
+        branch_name:
+          type: string
+          readOnly: true
+      required:
+      - actor
+      - actor_name
+      - body
+      - branch_name
+      - contact
+      - contact_name
+      - created_at
+      - id
+      - kind
+    ActivityKindEnum:
+      enum:
+      - contact_created
+      - contact_updated
+      - identifier_added
+      - lead_created
+      - lead_updated
+      - duplicate_resolved
+      - note
+      - assignment
+      - sla_escalated
+      - task_completed
+      type: string
+      description: |-
+        * `contact_created` - Contact created
+        * `contact_updated` - Contact updated
+        * `identifier_added` - Identifier added
+        * `lead_created` - Lead created
+        * `lead_updated` - Lead updated
+        * `duplicate_resolved` - Duplicate reviewed
+        * `note` - Internal note
+        * `assignment` - Lead assignment
+        * `sla_escalated` - SLA escalated
+        * `task_completed` - Task completed
+    Ad:
+      type: object
+      description: Reject spoofed read-only/unknown fields instead of silently ignoring
+        them.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        branch:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 150
+        destination:
+          type: string
+          format: uri
+          maxLength: 1000
+        platform:
+          $ref: '#/components/schemas/PlatformEnum'
+        campaign_tag:
+          type: string
+          maxLength: 100
+          pattern: ^[-a-zA-Z0-9_]+$
+        notes:
+          type: string
+          maxLength: 1000
+        tracking_url:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - branch
+      - campaign_tag
+      - created_at
+      - destination
+      - id
+      - name
+      - platform
+      - tracking_url
+    Attention:
+      type: object
+      properties:
+        server_time:
+          type: string
+          format: date-time
+        counts:
+          type: object
+          additionalProperties:
+            type: integer
+        alerts:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: object
+              additionalProperties: {}
+        job:
+          type: object
+          additionalProperties: {}
+          nullable: true
+        source_results:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+      required:
+      - alerts
+      - counts
+      - job
+      - server_time
+      - source_results
+    AutomationCompleteInput:
+      type: object
+      description: Reject spoofed read-only/unknown fields instead of silently ignoring
+        them.
+      properties:
+        resolution:
+          type: string
+          maxLength: 2000
+      required:
+      - resolution
+    AutomationRuleSourceEnum:
+      enum:
+      - all
+      - website
+      - call
+      - whatsapp
+      - manual
+      type: string
+      description: |-
+        * `all` - All sources
+        * `website` - Website
+        * `call` - Calls
+        * `whatsapp` - WhatsApp
+        * `manual` - Manual
+    BackgroundEnum:
+      enum:
+      - unknown
+      - student
+      - working
+      - job_seeker
+      - other
+      type: string
+      description: |-
+        * `unknown` - Not captured
+        * `student` - Student
+        * `working` - Working professional
+        * `job_seeker` - Job seeker
+        * `other` - Other
+    Branch:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          maxLength: 100
+        code:
+          type: string
+          maxLength: 40
+          pattern: ^[-a-zA-Z0-9_]+$
+        address:
+          type: string
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - code
+      - created_at
+      - id
+      - name
+    CSRF:
+      type: object
+      properties:
+        csrfToken:
+          type: string
+      required:
+      - csrfToken
+    Call:
+      type: object
+      description: Reject spoofed read-only/unknown fields instead of silently ignoring
+        them.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        branch:
+          type: string
+          format: uuid
+        branch_name:
+          type: string
+          readOnly: true
+        client_key:
+          type: string
+          maxLength: 100
+        origin:
+          type: string
+          readOnly: true
+        caller_phone:
+          type: string
+          maxLength: 20
+        caller_name:
+          type: string
+          maxLength: 200
+        business_phone:
+          type: string
+          maxLength: 20
+        direction:
+          $ref: '#/components/schemas/CallDirectionEnum'
+        status:
+          $ref: '#/components/schemas/CallStatusEnum'
+        started_at:
+          type: string
+          format: date-time
+        duration_seconds:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        forwarded_to:
+          type: string
+          maxLength: 200
+        notes:
+          type: string
+          maxLength: 2000
+        contact:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+        contact_name:
+          type: string
+          readOnly: true
+          nullable: true
+        contact_label:
+          type: string
+          readOnly: true
+          nullable: true
+        identity_status:
+          type: string
+          readOnly: true
+        candidates:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+          readOnly: true
+        lead:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+        lead_label:
+          type: string
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - branch
+      - branch_name
+      - caller_phone
+      - candidates
+      - client_key
+      - contact
+      - contact_label
+      - contact_name
+      - created_at
+      - id
+      - identity_status
+      - lead
+      - lead_label
+      - origin
+      - started_at
+      - status
+    CallDirectionEnum:
+      enum:
+      - incoming
+      - outgoing
+      type: string
+      description: |-
+        * `incoming` - Incoming
+        * `outgoing` - Outgoing
+    CallStatusEnum:
+      enum:
+      - answered
+      - missed
+      - voicemail
+      type: string
+      description: |-
+        * `answered` - Answered
+        * `missed` - Missed
+        * `voicemail` - Voicemail
+    Campaign:
+      type: object
+      description: Reject spoofed read-only/unknown fields instead of silently ignoring
+        them.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          maxLength: 150
+        channel:
+          type: string
+          format: uuid
+        channel_name:
+          type: string
+          readOnly: true
+        template:
+          type: string
+          format: uuid
+        template_name:
+          type: string
+          readOnly: true
+        parameters: {}
+        recipients:
+          type: array
+          items:
+            type: string
+            format: uuid
+        status:
+          type: string
+          readOnly: true
+        progress:
+          type: object
+          additionalProperties: {}
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - channel
+      - channel_name
+      - created_at
+      - id
+      - name
+      - progress
+      - recipients
+      - status
+      - template
+      - template_name
+    Canned:
+      type: object
+      description: Reject spoofed read-only/unknown fields instead of silently ignoring
+        them.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        branch:
+          type: string
+          format: uuid
+        branch_name:
+          type: string
+          readOnly: true
+        title:
+          type: string
+          maxLength: 100
+        body:
+          type: string
+          maxLength: 4096
+        is_active:
+          type: boolean
+      required:
+      - body
+      - branch
+      - branch_name
+      - id
+      - title
+    Channel:
+      type: object
+      description: Reject spoofed read-only/unknown fields instead of silently ignoring
+        them.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          maxLength: 100
+        branch:
+          type: string
+          format: uuid
+        branch_name:
+          type: string
+          readOnly: true
+        phone_number_id:
+          type: string
+          pattern: ^[0-9]{1,40}$
+        waba_id:
+          type: string
+          pattern: ^[0-9]{1,40}$
+        is_active:
+          type: boolean
+        business_phone:
+          type: string
+          maxLength: 20
+      required:
+      - branch
+      - branch_name
+      - id
+      - name
+      - phone_number_id
+      - waba_id
+    CompleteInput:
+      type: object
+      description: Reject spoofed read-only/unknown fields instead of silently ignoring
+        them.
+      properties:
+        resolution:
+          type: string
+          maxLength: 2000
+        next_action:
+          type: string
+          maxLength: 500
+        next_action_at:
+          type: string
+          format: date-time
+          nullable: true
+        no_followup_reason:
+          type: string
+          maxLength: 500
+      required:
+      - resolution
+    ConsentEnum:
+      enum:
+      - unknown
+      - granted
+      - revoked
+      type: string
+      description: |-
+        * `unknown` - Unknown
+        * `granted` - Granted
+        * `revoked` - Revoked
+    ConsentInput:
+      type: object
+      description: Reject spoofed read-only/unknown fields instead of silently ignoring
+        them.
+      properties:
+        state:
+          $ref: '#/components/schemas/ConsentInputStateEnum'
+        evidence:
+          type: string
+          maxLength: 1000
+      required:
+      - evidence
+      - state
+    ConsentInputStateEnum:
+      enum:
+      - granted
+      - revoked
+      type: string
+      description: |-
+        * `granted` - granted
+        * `revoked` - revoked
+    Contact:
+      type: object
+      description: Reject spoofed read-only/unknown fields instead of silently ignoring
+        them.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        contact_id:
+          type: string
+          readOnly: true
+        full_name:
+          type: string
+          maxLength: 200
+        branch:
+          type: string
+          format: uuid
+        source:
+          $ref: '#/components/schemas/SourceEnum'
+        identifiers:
+          type: array
+          items:
+            $ref: '#/components/schemas/IdentifierInput'
+          writeOnly: true
+        identifier_records:
+          type: array
+          items:
+            $ref: '#/components/schemas/Identifier'
+          readOnly: true
+        created_by:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        branch_name:
+          type: string
+          readOnly: true
+        can_edit:
+          type: boolean
+          readOnly: true
+      required:
+      - branch_name
+      - can_edit
+      - contact_id
+      - created_at
+      - created_by
+      - full_name
+      - id
+      - identifier_records
+      - identifiers
+      - updated_at
+    ContactIdentifierKindEnum:
+      enum:
+      - phone
+      - email
+      - external
+      type: string
+      description: |-
+        * `phone` - Phone
+        * `email` - Email
+        * `external` - External provider ID
+    ControlInput:
+      type: object
+      description: Reject spoofed read-only/unknown fields instead of silently ignoring
+        them.
+      properties:
+        action:
+          $ref: '#/components/schemas/ControlInputActionEnum'
+        reason:
+          type: string
+          maxLength: 250
+      required:
+      - action
+      - reason
+    ControlInputActionEnum:
+      enum:
+      - pause
+      - resume
+      - stop
+      type: string
+      description: |-
+        * `pause` - pause
+        * `resume` - resume
+        * `stop` - stop
+    Conversation:
+      type: object
+      description: Reject spoofed read-only/unknown fields instead of silently ignoring
+        them.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        channel:
+          type: string
+          format: uuid
+          readOnly: true
+        channel_name:
+          type: string
+          readOnly: true
+        branch:
+          type: string
+          format: uuid
+          readOnly: true
+        branch_name:
+          type: string
+          readOnly: true
+        wa_id:
+          type: string
+          readOnly: true
+        contact:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+        contact_name:
+          type: string
+          readOnly: true
+          nullable: true
+        last_inbound_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        consent:
+          allOf:
+          - $ref: '#/components/schemas/ConsentEnum'
+          readOnly: true
+        consent_evidence:
+          type: string
+          readOnly: true
+        consent_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        service_window_open:
+          type: boolean
+          readOnly: true
+        mode:
+          type: string
+          readOnly: true
+        live_sends_enabled:
+          type: boolean
+          readOnly: true
+      required:
+      - branch
+      - branch_name
+      - channel
+      - channel_name
+      - consent
+      - consent_at
+      - consent_evidence
+      - contact
+      - contact_name
+      - id
+      - last_inbound_at
+      - live_sends_enabled
+      - mode
+      - service_window_open
+      - updated_at
+      - wa_id
+    ConversationInput:
+      type: object
+      description: Reject spoofed read-only/unknown fields instead of silently ignoring
+        them.
+      properties:
+        channel:
+          type: string
+          format: uuid
+        wa_id:
+          type: string
+          description: International WhatsApp phone number, digits only.
+          pattern: ^[1-9][0-9]{6,14}$
+      required:
+      - channel
+      - wa_id
+    CounsellorProfile:
+      type: object
+      description: Reject spoofed read-only/unknown fields instead of silently ignoring
+        them.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user:
+          type: string
+          format: uuid
+        is_available:
+          type: boolean
+        can_receive_leads:
+          type: boolean
+        max_active_leads:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        workload:
+          type: integer
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        user_name:
+          type: string
+          readOnly: true
+        branch:
+          type: string
+          format: uuid
+          readOnly: true
+        user_active:
+          type: boolean
+          readOnly: true
+      required:
+      - branch
+      - id
+      - updated_at
+      - user
+      - user_active
+      - user_name
+      - workload
+    Dashboard:
+      type: object
+      properties:
+        contacts:
+          type: integer
+        active_leads:
+          type: integer
+        unassigned:
+          type: integer
+        overdue_tasks:
+          type: integer
+        available_counsellors:
+          type: integer
+        pipeline:
+          type: object
+          additionalProperties:
+            type: integer
+        branches:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+        recent_activities:
+          type: array
+          items:
+            $ref: '#/components/schemas/Activity'
+      required:
+      - active_leads
+      - available_counsellors
+      - branches
+      - contacts
+      - overdue_tasks
+      - pipeline
+      - recent_activities
+      - unassigned
+    DecisionEnum:
+      enum:
+      - linked
+      - separate
+      - rejected
+      type: string
+      description: |-
+        * `linked` - linked
+        * `separate` - separate
+        * `rejected` - rejected
+    Demo:
+      type: object
+      description: Reject spoofed read-only/unknown fields instead of silently ignoring
+        them.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        lead:
+          type: string
+          format: uuid
+        lead_label:
+          type: string
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        owner_name:
+          type: string
+          readOnly: true
+          default: Manager queue
+        branch_name:
+          type: string
+          readOnly: true
+        course:
+          type: string
+          maxLength: 200
+        mode:
+          $ref: '#/components/schemas/ModeEnum'
+        location:
+          type: string
+          maxLength: 250
+        starts_at:
+          type: string
+          format: date-time
+        duration_minutes:
+          type: integer
+          maximum: 180
+          minimum: 15
+          default: 60
+        status:
+          allOf:
+          - $ref: '#/components/schemas/DemoStatusEnum'
+          readOnly: true
+        outcome:
+          type: string
+          readOnly: true
+        version:
+          type: integer
+          readOnly: true
+        client_key:
+          type: string
+          format: uuid
+          writeOnly: true
+      required:
+      - branch_name
+      - client_key
+      - course
+      - id
+      - lead
+      - lead_label
+      - location
+      - mode
+      - name
+      - outcome
+      - owner_name
+      - starts_at
+      - status
+      - version
+    DemoChangeInput:
+      type: object
+      description: Reject spoofed read-only/unknown fields instead of silently ignoring
+        them.
+      properties:
+        action:
+          $ref: '#/components/schemas/DemoChangeInputActionEnum'
+        version:
+          type: integer
+          minimum: 1
+        reason:
+          type: string
+          maxLength: 2000
+        starts_at:
+          type: string
+          format: date-time
+        duration_minutes:
+          type: integer
+          maximum: 180
+          minimum: 15
+        location:
+          type: string
+          maxLength: 250
+      required:
+      - action
+      - reason
+      - version
+    DemoChangeInputActionEnum:
+      enum:
+      - reschedule
+      - attended
+      - no_show
+      - cancelled
+      type: string
+      description: |-
+        * `reschedule` - reschedule
+        * `attended` - attended
+        * `no_show` - no_show
+        * `cancelled` - cancelled
+    DemoStatusEnum:
+      enum:
+      - scheduled
+      - attended
+      - no_show
+      - cancelled
+      type: string
+      description: |-
+        * `scheduled` - Scheduled
+        * `attended` - Attended
+        * `no_show` - Did not attend
+        * `cancelled` - Cancelled
+    DemoTask:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        demo:
+          type: string
+          format: uuid
+        lead:
+          type: string
+          format: uuid
+        name:
+          type: string
+        course:
+          type: string
+        kind:
+          $ref: '#/components/schemas/DemoTaskKindEnum'
+        starts_at:
+          type: string
+          format: date-time
+        assignee_name:
+          type: string
+          default: Manager queue
+        due_at:
+          type: string
+          format: date-time
+        status:
+          $ref: '#/components/schemas/DemoTaskStatusEnum'
+        resolution:
+          type: string
+          maxLength: 2000
+      required:
+      - course
+      - demo
+      - due_at
+      - id
+      - kind
+      - lead
+      - name
+      - starts_at
+    DemoTaskCompleteInput:
+      type: object
+      description: Reject spoofed read-only/unknown fields instead of silently ignoring
+        them.
+      properties:
+        resolution:
+          type: string
+          maxLength: 2000
+      required:
+      - resolution
+    DemoTaskKindEnum:
+      enum:
+      - reminder
+      - attendance
+      - no_show_followup
+      - attended_followup
+      type: string
+      description: |-
+        * `reminder` - Confirm demo with student
+        * `attendance` - Record demo attendance
+        * `no_show_followup` - Rebook missed demo
+        * `attended_followup` - Discuss admission after demo
+    DemoTaskStatusEnum:
+      enum:
+      - pending
+      - completed
+      - cancelled
+      type: string
+      description: |-
+        * `pending` - Pending
+        * `completed` - Completed
+        * `cancelled` - Cancelled
+    DuplicateReview:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        branch:
+          type: string
+          format: uuid
+          readOnly: true
+        full_name:
+          type: string
+          readOnly: true
+        source:
+          allOf:
+          - $ref: '#/components/schemas/SourceEnum'
+          readOnly: true
+        identifiers:
+          readOnly: true
+        target_contact:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/DuplicateReviewStatusEnum'
+          readOnly: true
+        candidate_contacts:
+          type: array
+          items:
+            type: string
+          readOnly: true
+        resolved_contact:
+          type: string
+          nullable: true
+          readOnly: true
+        reason:
+          type: string
+          readOnly: true
+        created_by:
+          type: string
+          format: uuid
+          readOnly: true
+        resolved_by:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        resolved_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+      required:
+      - branch
+      - candidate_contacts
+      - created_at
+      - created_by
+      - full_name
+      - id
+      - identifiers
+      - reason
+      - resolved_at
+      - resolved_by
+      - resolved_contact
+      - source
+      - status
+      - target_contact
+    DuplicateReviewStatusEnum:
+      enum:
+      - pending
+      - separate
+      - linked
+      - rejected
+      type: string
+      description: |-
+        * `pending` - Pending
+        * `separate` - Confirmed distinct person
+        * `linked` - Linked to existing person
+        * `rejected` - Rejected intake
+    Employee:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        display_name:
+          type: string
+          readOnly: true
+        role:
+          allOf:
+          - $ref: '#/components/schemas/RoleEnum'
+          readOnly: true
+        branch:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+        is_active:
+          type: boolean
+          readOnly: true
+          title: Active
+          description: Designates whether this user should be treated as active. Unselect
+            this instead of deleting accounts.
+        routing_profile_id:
+          type: integer
+          readOnly: true
+          nullable: true
+      required:
+      - branch
+      - display_name
+      - id
+      - is_active
+      - role
+      - routing_profile_id
+    EnquiryInput:
+      type: object
+      description: Reject spoofed read-only/unknown fields instead of silently ignoring
+        them.
+      properties:
+        title:
+          type: string
+          maxLength: 200
+      required:
+      - title
+    EnrollInput:
+      type: object
+      description: Reject spoofed read-only/unknown fields instead of silently ignoring
+        them.
+      properties:
+        rule:
+          type: string
+          format: uuid
+        lead:
+          type: string
+          format: uuid
+        call:
+          type: string
+          format: uuid
+        conversation:
+          type: string
+          format: uuid
+      required:
+      - rule
+    Event:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        run:
+          type: string
+          format: uuid
+        name:
+          type: string
+        code:
+          type: string
+          maxLength: 40
+        detail:
+          type: string
+          maxLength: 2500
+        actor:
+          type: string
+          format: uuid
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - code
+      - created_at
+      - detail
+      - id
+      - name
+      - run
+    Feed:
+      type: object
+      properties:
+        count:
+          type: integer
+        page:
+          type: integer
+        page_size:
+          type: integer
+        has_next:
+          type: boolean
+        server_time:
+          type: string
+          format: date-time
+        sources:
+          type: array
+          items:
+            type: string
+        totals:
+          type: object
+          additionalProperties:
+            type: integer
+        source_totals:
+          type: object
+          additionalProperties:
+            type: integer
+        whatsapp_mode:
+          type: string
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/FeedEntry'
+      required:
+      - count
+      - has_next
+      - page
+      - page_size
+      - results
+      - server_time
+      - source_totals
+      - sources
+      - totals
+      - whatsapp_mode
+    FeedEntry:
+      type: object
+      properties:
+        key:
+          type: string
+        source:
+          type: string
+        source_label:
+          type: string
+        name:
+          type: string
+        phone:
+          type: string
+          nullable: true
+        title:
+          type: string
+        preview:
+          type: string
+          nullable: true
+        branch:
+          type: string
+        branch_name:
+          type: string
+        status:
+          type: string
+        owner_name:
+          type: string
+          nullable: true
+        lead:
+          type: string
+          nullable: true
+        lead_label:
+          type: string
+          nullable: true
+        contact:
+          type: string
+          nullable: true
+        received_at:
+          type: string
+          format: date-time
+          nullable: true
+        activity_at:
+          type: string
+          format: date-time
+        target:
+          type: string
+        target_id:
+          type: string
+      required:
+      - activity_at
+      - branch
+      - branch_name
+      - contact
+      - key
+      - lead
+      - lead_label
+      - name
+      - owner_name
+      - phone
+      - preview
+      - received_at
+      - source
+      - source_label
+      - status
+      - target
+      - target_id
+      - title
+    History:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        lead:
+          type: string
+          format: uuid
+          readOnly: true
+        previous_owner:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+        new_owner:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+        previous_branch:
+          type: string
+          format: uuid
+          readOnly: true
+        branch:
+          type: string
+          format: uuid
+          readOnly: true
+        reason:
+          type: string
+          readOnly: true
+        actor:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/HistoryStatusEnum'
+          readOnly: true
+        version:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        lead_label:
+          type: string
+          readOnly: true
+        branch_name:
+          type: string
+          readOnly: true
+        previous_owner_name:
+          type: string
+          nullable: true
+          readOnly: true
+        new_owner_name:
+          type: string
+          nullable: true
+          readOnly: true
+        actor_name:
+          type: string
+          readOnly: true
+      required:
+      - actor
+      - actor_name
+      - branch
+      - branch_name
+      - created_at
+      - id
+      - lead
+      - lead_label
+      - new_owner
+      - new_owner_name
+      - previous_branch
+      - previous_owner
+      - previous_owner_name
+      - reason
+      - status
+      - version
+    HistoryStatusEnum:
+      enum:
+      - assigned
+      - reassigned
+      - queued
+      - transferred
+      - acknowledged
+      - escalated
+      type: string
+      description: |-
+        * `assigned` - Assigned
+        * `reassigned` - Reassigned
+        * `queued` - Queued
+        * `transferred` - Branch transferred
+        * `acknowledged` - Acknowledged
+        * `escalated` - Escalated
+    Identifier:
+      type: object
+      description: Reject spoofed read-only/unknown fields instead of silently ignoring
+        them.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        contact:
+          type: string
+          format: uuid
+        kind:
+          $ref: '#/components/schemas/ContactIdentifierKindEnum'
+        value:
+          type: string
+          maxLength: 254
+        normalized_value:
+          type: string
+          readOnly: true
+        namespace:
+          type: string
+          maxLength: 40
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - contact
+      - created_at
+      - id
+      - kind
+      - normalized_value
+      - value
+    IdentifierInput:
+      type: object
+      description: Reject spoofed read-only/unknown fields instead of silently ignoring
+        them.
+      properties:
+        kind:
+          $ref: '#/components/schemas/ContactIdentifierKindEnum'
+        value:
+          type: string
+          maxLength: 254
+        namespace:
+          type: string
+          default: ''
+          maxLength: 40
+      required:
+      - kind
+      - value
+    JoiningTimelineEnum:
+      enum:
+      - undecided
+      - immediate
+      - month
+      - quarter
+      - later
+      type: string
+      description: |-
+        * `undecided` - Undecided
+        * `immediate` - Immediately
+        * `month` - Within a month
+        * `quarter` - Within three months
+        * `later` - Later
+    Lead:
+      type: object
+      description: Reject spoofed read-only/unknown fields instead of silently ignoring
+        them.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        lead_id:
+          type: string
+          readOnly: true
+        contact:
+          type: string
+          format: uuid
+        branch:
+          type: string
+          format: uuid
+        owner:
+          type: string
+          format: uuid
+          nullable: true
+        title:
+          type: string
+          maxLength: 200
+        source:
+          $ref: '#/components/schemas/SourceEnum'
+        status:
+          $ref: '#/components/schemas/LeadStatusEnum'
+        next_action:
+          type: string
+          maxLength: 500
+        next_action_at:
+          type: string
+          format: date-time
+          nullable: true
+        no_followup_reason:
+          type: string
+          maxLength: 500
+        unassigned_reason:
+          type: string
+          maxLength: 500
+        created_by:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        assignment_version:
+          type: integer
+          readOnly: true
+        acknowledgement_due_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        acknowledged_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        routing_attempts:
+          type: integer
+          readOnly: true
+        contact_name:
+          type: string
+          readOnly: true
+        owner_name:
+          type: string
+          nullable: true
+          readOnly: true
+        branch_name:
+          type: string
+          readOnly: true
+        can_edit:
+          type: boolean
+          readOnly: true
+      required:
+      - acknowledged_at
+      - acknowledgement_due_at
+      - assignment_version
+      - branch_name
+      - can_edit
+      - contact
+      - contact_name
+      - created_at
+      - created_by
+      - id
+      - lead_id
+      - owner_name
+      - routing_attempts
+      - title
+      - updated_at
+    LeadStatusEnum:
+      enum:
+      - new
+      - contacted
+      - qualified
+      - won
+      - lost
+      type: string
+      description: |-
+        * `new` - New
+        * `contacted` - Contacted
+        * `qualified` - Qualified
+        * `won` - Won
+        * `lost` - Lost
+    LinkInput:
+      type: object
+      description: Reject spoofed read-only/unknown fields instead of silently ignoring
+        them.
+      properties:
+        contact:
+          type: string
+          format: uuid
+      required:
+      - contact
+    Login:
+      type: object
+      properties:
+        username:
+          type: string
+          maxLength: 150
+        password:
+          type: string
+          writeOnly: true
+          maxLength: 1024
+      required:
+      - password
+      - username
+    Match:
+      type: object
+      description: Reject spoofed read-only/unknown fields instead of silently ignoring
+        them.
+      properties:
+        identifiers:
+          type: array
+          items:
+            $ref: '#/components/schemas/IdentifierInput'
+      required:
+      - identifiers
+    MatchResult:
+      type: object
+      properties:
+        needs_review:
+          type: boolean
+        candidate_contacts:
+          type: array
+          items:
+            type: string
+            format: uuid
+      required:
+      - candidate_contacts
+      - needs_review
+    Message:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        conversation:
+          type: string
+          format: uuid
+          readOnly: true
+        direction:
+          allOf:
+          - $ref: '#/components/schemas/MessageDirectionEnum'
+          readOnly: true
+        kind:
+          type: string
+          readOnly: true
+        text:
+          type: string
+          readOnly: true
+        template:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+        template_name:
+          type: string
+          readOnly: true
+          nullable: true
+        parameters:
+          readOnly: true
+        client_key:
+          type: string
+          readOnly: true
+          nullable: true
+        provider_id:
+          type: string
+          readOnly: true
+          nullable: true
+        mode:
+          type: string
+          readOnly: true
+        queue_status:
+          allOf:
+          - $ref: '#/components/schemas/QueueStatusEnum'
+          readOnly: true
+        delivery_status:
+          type: string
+          readOnly: true
+        attempts:
+          type: integer
+          readOnly: true
+        next_attempt_at:
+          type: string
+          format: date-time
+          readOnly: true
+        error_code:
+          type: string
+          readOnly: true
+        occurred_at:
+          type: string
+          format: date-time
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        recipient:
+          type: string
+          readOnly: true
+        channel_name:
+          type: string
+          readOnly: true
+      required:
+      - attempts
+      - channel_name
+      - client_key
+      - conversation
+      - created_at
+      - delivery_status
+      - direction
+      - error_code
+      - id
+      - kind
+      - mode
+      - next_attempt_at
+      - occurred_at
+      - parameters
+      - provider_id
+      - queue_status
+      - recipient
+      - template
+      - template_name
+      - text
+    MessageDirectionEnum:
+      enum:
+      - inbound
+      - outbound
+      type: string
+      description: |-
+        * `inbound` - Inbound
+        * `outbound` - Outbound
+    MessageInput:
+      type: object
+      description: Reject spoofed read-only/unknown fields instead of silently ignoring
+        them.
+      properties:
+        conversation:
+          type: string
+          format: uuid
+        client_key:
+          type: string
+          pattern: ^[A-Za-z0-9_-]{1,100}$
+        text:
+          type: string
+          maxLength: 4096
+        template:
+          type: string
+          format: uuid
+          nullable: true
+        parameters:
+          type: array
+          items:
+            type: string
+            maxLength: 1024
+          maxItems: 100
+      required:
+      - client_key
+      - conversation
+    MockTemplateResult:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        mode:
+          type: string
+      required:
+      - id
+      - mode
+    ModeEnum:
+      enum:
+      - online
+      - classroom
+      type: string
+      description: |-
+        * `online` - Online
+        * `classroom` - Classroom
+    OverrideInput:
+      type: object
+      description: Reject spoofed read-only/unknown fields instead of silently ignoring
+        them.
+      properties:
+        lead:
+          type: string
+          format: uuid
+        owner:
+          type: string
+          format: uuid
+          nullable: true
+        reason:
+          type: string
+          maxLength: 2000
+      required:
+      - lead
+      - owner
+      - reason
+    PaginatedActivityList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Activity'
+    PaginatedAdList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Ad'
+    PaginatedBranchList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Branch'
+    PaginatedCallList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Call'
+    PaginatedCampaignList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Campaign'
+    PaginatedCannedList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Canned'
+    PaginatedChannelList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Channel'
+    PaginatedContactList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Contact'
+    PaginatedConversationList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Conversation'
+    PaginatedCounsellorProfileList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/CounsellorProfile'
+    PaginatedDemoList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Demo'
+    PaginatedDemoTaskList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/DemoTask'
+    PaginatedDuplicateReviewList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/DuplicateReview'
+    PaginatedEmployeeList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Employee'
+    PaginatedEventList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Event'
+    PaginatedHistoryList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/History'
+    PaginatedIdentifierList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Identifier'
+    PaginatedLeadList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Lead'
+    PaginatedMessageList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Message'
+    PaginatedPolicyList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Policy'
+    PaginatedRuleList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Rule'
+    PaginatedRunList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Run'
+    PaginatedSubmissionList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Submission'
+    PaginatedTaskList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Task'
+    PaginatedTemplateList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Template'
+    PaginatedWorkList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Work'
+    PatchedBranch:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          maxLength: 100
+        code:
+          type: string
+          maxLength: 40
+          pattern: ^[-a-zA-Z0-9_]+$
+        address:
+          type: string
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedCanned:
+      type: object
+      description: Reject spoofed read-only/unknown fields instead of silently ignoring
+        them.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        branch:
+          type: string
+          format: uuid
+        branch_name:
+          type: string
+          readOnly: true
+        title:
+          type: string
+          maxLength: 100
+        body:
+          type: string
+          maxLength: 4096
+        is_active:
+          type: boolean
+    PatchedChannel:
+      type: object
+      description: Reject spoofed read-only/unknown fields instead of silently ignoring
+        them.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          maxLength: 100
+        branch:
+          type: string
+          format: uuid
+        branch_name:
+          type: string
+          readOnly: true
+        phone_number_id:
+          type: string
+          pattern: ^[0-9]{1,40}$
+        waba_id:
+          type: string
+          pattern: ^[0-9]{1,40}$
+        is_active:
+          type: boolean
+        business_phone:
+          type: string
+          maxLength: 20
+    PatchedContact:
+      type: object
+      description: Reject spoofed read-only/unknown fields instead of silently ignoring
+        them.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        contact_id:
+          type: string
+          readOnly: true
+        full_name:
+          type: string
+          maxLength: 200
+        branch:
+          type: string
+          format: uuid
+        source:
+          $ref: '#/components/schemas/SourceEnum'
+        identifiers:
+          type: array
+          items:
+            $ref: '#/components/schemas/IdentifierInput'
+          writeOnly: true
+        identifier_records:
+          type: array
+          items:
+            $ref: '#/components/schemas/Identifier'
+          readOnly: true
+        created_by:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        branch_name:
+          type: string
+          readOnly: true
+        can_edit:
+          type: boolean
+          readOnly: true
+    PatchedCounsellorProfile:
+      type: object
+      description: Reject spoofed read-only/unknown fields instead of silently ignoring
+        them.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user:
+          type: string
+          format: uuid
+        is_available:
+          type: boolean
+        can_receive_leads:
+          type: boolean
+        max_active_leads:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        workload:
+          type: integer
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        user_name:
+          type: string
+          readOnly: true
+        branch:
+          type: string
+          format: uuid
+          readOnly: true
+        user_active:
+          type: boolean
+          readOnly: true
+    PatchedLead:
+      type: object
+      description: Reject spoofed read-only/unknown fields instead of silently ignoring
+        them.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        lead_id:
+          type: string
+          readOnly: true
+        contact:
+          type: string
+          format: uuid
+        branch:
+          type: string
+          format: uuid
+        owner:
+          type: string
+          format: uuid
+          nullable: true
+        title:
+          type: string
+          maxLength: 200
+        source:
+          $ref: '#/components/schemas/SourceEnum'
+        status:
+          $ref: '#/components/schemas/LeadStatusEnum'
+        next_action:
+          type: string
+          maxLength: 500
+        next_action_at:
+          type: string
+          format: date-time
+          nullable: true
+        no_followup_reason:
+          type: string
+          maxLength: 500
+        unassigned_reason:
+          type: string
+          maxLength: 500
+        created_by:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        assignment_version:
+          type: integer
+          readOnly: true
+        acknowledgement_due_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        acknowledged_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        routing_attempts:
+          type: integer
+          readOnly: true
+        contact_name:
+          type: string
+          readOnly: true
+        owner_name:
+          type: string
+          nullable: true
+          readOnly: true
+        branch_name:
+          type: string
+          readOnly: true
+        can_edit:
+          type: boolean
+          readOnly: true
+    PatchedPolicy:
+      type: object
+      description: Reject spoofed read-only/unknown fields instead of silently ignoring
+        them.
+      properties:
+        branch:
+          type: string
+          format: uuid
+        last_position:
+          type: integer
+          readOnly: true
+        acknowledgement_minutes:
+          type: integer
+          maximum: 10080
+          minimum: 1
+        followup_minutes:
+          type: integer
+          maximum: 43200
+          minimum: 1
+        max_reassignments:
+          type: integer
+          maximum: 20
+          minimum: 0
+    PatchedQualification:
+      type: object
+      description: Reject spoofed read-only/unknown fields instead of silently ignoring
+        them.
+      properties:
+        lead:
+          type: string
+          format: uuid
+          readOnly: true
+        course_interest:
+          type: string
+          maxLength: 200
+        background:
+          $ref: '#/components/schemas/BackgroundEnum'
+        training_mode:
+          $ref: '#/components/schemas/TrainingModeEnum'
+        preferred_location:
+          type: string
+          maxLength: 120
+        preferred_schedule:
+          $ref: '#/components/schemas/PreferredScheduleEnum'
+        joining_timeline:
+          $ref: '#/components/schemas/JoiningTimelineEnum'
+        readiness:
+          $ref: '#/components/schemas/ReadinessEnum'
+        notes:
+          type: string
+          maxLength: 2000
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        missing_fields:
+          type: array
+          items:
+            type: string
+          readOnly: true
+    PatchedRule:
+      type: object
+      description: Reject spoofed read-only/unknown fields instead of silently ignoring
+        them.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        branch:
+          type: string
+          format: uuid
+        branch_name:
+          type: string
+          readOnly: true
+        name:
+          type: string
+          maxLength: 150
+        source:
+          $ref: '#/components/schemas/AutomationRuleSourceEnum'
+        is_active:
+          type: boolean
+        enabled_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        version:
+          type: integer
+          readOnly: true
+        acknowledgement_minutes:
+          type: integer
+          maximum: 60
+          minimum: 0
+        acknowledgement_text:
+          type: string
+          maxLength: 2000
+        callback_minutes:
+          type: integer
+          maximum: 1440
+          minimum: 1
+        business_hours:
+          type: boolean
+        start_hour:
+          type: integer
+          maximum: 23
+          minimum: 0
+        end_hour:
+          type: integer
+          maximum: 24
+          minimum: 1
+        steps:
+          type: array
+          items:
+            $ref: '#/components/schemas/StepInput'
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PlatformEnum:
+      enum:
+      - facebook
+      - instagram
+      type: string
+      description: |-
+        * `facebook` - Facebook
+        * `instagram` - Instagram
+    Policy:
+      type: object
+      description: Reject spoofed read-only/unknown fields instead of silently ignoring
+        them.
+      properties:
+        branch:
+          type: string
+          format: uuid
+        last_position:
+          type: integer
+          readOnly: true
+        acknowledgement_minutes:
+          type: integer
+          maximum: 10080
+          minimum: 1
+        followup_minutes:
+          type: integer
+          maximum: 43200
+          minimum: 1
+        max_reassignments:
+          type: integer
+          maximum: 20
+          minimum: 0
+      required:
+      - branch
+      - last_position
+    PreferredScheduleEnum:
+      enum:
+      - undecided
+      - weekday
+      - weekend
+      - flexible
+      type: string
+      description: |-
+        * `undecided` - Undecided
+        * `weekday` - Weekday
+        * `weekend` - Weekend
+        * `flexible` - Flexible
+    Profile:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        username:
+          type: string
+          readOnly: true
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+        first_name:
+          type: string
+          readOnly: true
+        last_name:
+          type: string
+          readOnly: true
+        email:
+          type: string
+          format: email
+          readOnly: true
+          title: Email address
+        role:
+          allOf:
+          - $ref: '#/components/schemas/RoleEnum'
+          readOnly: true
+        branch:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+        capabilities:
+          type: object
+          additionalProperties:
+            type: boolean
+          readOnly: true
+      required:
+      - branch
+      - capabilities
+      - email
+      - first_name
+      - id
+      - last_name
+      - role
+      - username
+    Qualification:
+      type: object
+      description: Reject spoofed read-only/unknown fields instead of silently ignoring
+        them.
+      properties:
+        lead:
+          type: string
+          format: uuid
+          readOnly: true
+        course_interest:
+          type: string
+          maxLength: 200
+        background:
+          $ref: '#/components/schemas/BackgroundEnum'
+        training_mode:
+          $ref: '#/components/schemas/TrainingModeEnum'
+        preferred_location:
+          type: string
+          maxLength: 120
+        preferred_schedule:
+          $ref: '#/components/schemas/PreferredScheduleEnum'
+        joining_timeline:
+          $ref: '#/components/schemas/JoiningTimelineEnum'
+        readiness:
+          $ref: '#/components/schemas/ReadinessEnum'
+        notes:
+          type: string
+          maxLength: 2000
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        missing_fields:
+          type: array
+          items:
+            type: string
+          readOnly: true
+      required:
+      - lead
+      - missing_fields
+      - updated_at
+    QueueStatusEnum:
+      enum:
+      - received
+      - queued
+      - retry
+      - sending
+      - sent
+      - failed
+      - blocked
+      - unknown
+      type: string
+      description: |-
+        * `received` - Received
+        * `queued` - Queued
+        * `retry` - Retry scheduled
+        * `sending` - Dispatch in progress
+        * `sent` - Accepted by provider
+        * `failed` - Failed
+        * `blocked` - Policy blocked
+        * `unknown` - Outcome unknown; reconcile before resending
+    ReadinessEnum:
+      enum:
+      - exploring
+      - demo_ready
+      - admission_ready
+      - later
+      type: string
+      description: |-
+        * `exploring` - Exploring
+        * `demo_ready` - Ready for a demo
+        * `admission_ready` - Ready for admission
+        * `later` - Follow up later
+    Receipt:
+      type: object
+      properties:
+        received:
+          type: boolean
+        receipt_id:
+          type: string
+          format: uuid
+      required:
+      - receipt_id
+      - received
+    Resolve:
+      type: object
+      description: Reject spoofed read-only/unknown fields instead of silently ignoring
+        them.
+      properties:
+        decision:
+          $ref: '#/components/schemas/DecisionEnum'
+        reason:
+          type: string
+          maxLength: 2000
+        contact:
+          type: string
+          format: uuid
+      required:
+      - decision
+      - reason
+    ResolveInput:
+      type: object
+      description: Reject spoofed read-only/unknown fields instead of silently ignoring
+        them.
+      properties:
+        decision:
+          $ref: '#/components/schemas/DecisionEnum'
+        reason:
+          type: string
+          maxLength: 2000
+        contact:
+          type: string
+          format: uuid
+      required:
+      - decision
+      - reason
+    RoleEnum:
+      enum:
+      - super_admin
+      - management
+      - branch_manager
+      - counsellor
+      - accounts
+      - support
+      type: string
+      description: |-
+        * `super_admin` - Super Admin
+        * `management` - Management
+        * `branch_manager` - Branch Manager
+        * `counsellor` - Counsellor
+        * `accounts` - Accounts Team
+        * `support` - Trainer/Student Support
+    Rule:
+      type: object
+      description: Reject spoofed read-only/unknown fields instead of silently ignoring
+        them.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        branch:
+          type: string
+          format: uuid
+        branch_name:
+          type: string
+          readOnly: true
+        name:
+          type: string
+          maxLength: 150
+        source:
+          $ref: '#/components/schemas/AutomationRuleSourceEnum'
+        is_active:
+          type: boolean
+        enabled_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        version:
+          type: integer
+          readOnly: true
+        acknowledgement_minutes:
+          type: integer
+          maximum: 60
+          minimum: 0
+        acknowledgement_text:
+          type: string
+          maxLength: 2000
+        callback_minutes:
+          type: integer
+          maximum: 1440
+          minimum: 1
+        business_hours:
+          type: boolean
+        start_hour:
+          type: integer
+          maximum: 23
+          minimum: 0
+        end_hour:
+          type: integer
+          maximum: 24
+          minimum: 1
+        steps:
+          type: array
+          items:
+            $ref: '#/components/schemas/StepInput'
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - branch
+      - branch_name
+      - created_at
+      - enabled_at
+      - id
+      - name
+      - version
+    Run:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        rule:
+          type: string
+          format: uuid
+        rule_name:
+          type: string
+        branch:
+          type: string
+          format: uuid
+        branch_name:
+          type: string
+        lead:
+          type: string
+          format: uuid
+          nullable: true
+        call:
+          type: string
+          format: uuid
+          nullable: true
+        conversation:
+          type: string
+          format: uuid
+          nullable: true
+        source:
+          type: string
+          maxLength: 12
+        name:
+          type: string
+          maxLength: 200
+        phone:
+          type: string
+          maxLength: 20
+        state:
+          $ref: '#/components/schemas/RunStateEnum'
+        reason:
+          type: string
+          maxLength: 250
+        snapshot: {}
+        started_at:
+          type: string
+          format: date-time
+        can_control:
+          type: boolean
+          readOnly: true
+      required:
+      - branch
+      - branch_name
+      - can_control
+      - id
+      - name
+      - rule
+      - rule_name
+      - snapshot
+      - source
+    RunStateEnum:
+      enum:
+      - active
+      - paused
+      - stopped
+      - completed
+      type: string
+      description: |-
+        * `active` - Active
+        * `paused` - Paused
+        * `stopped` - Stopped
+        * `completed` - Completed
+    ScopedLeadInput:
+      type: object
+      description: Reject spoofed read-only/unknown fields instead of silently ignoring
+        them.
+      properties:
+        lead:
+          type: string
+          format: uuid
+      required:
+      - lead
+    Settings:
+      type: object
+      properties:
+        mode:
+          type: string
+        live_sends_enabled:
+          type: boolean
+        bulk_sends_enabled:
+          type: boolean
+        access_token_configured:
+          type: boolean
+        app_secret_configured:
+          type: boolean
+        verify_token_configured:
+          type: boolean
+        graph_version:
+          type: string
+        webhook_path:
+          type: string
+      required:
+      - access_token_configured
+      - app_secret_configured
+      - bulk_sends_enabled
+      - graph_version
+      - live_sends_enabled
+      - mode
+      - verify_token_configured
+      - webhook_path
+    SourceEnum:
+      enum:
+      - manual
+      - website
+      - whatsapp
+      - call
+      type: string
+      description: |-
+        * `manual` - Manual
+        * `website` - Website
+        * `whatsapp` - WhatsApp
+        * `call` - Call
+    StepInput:
+      type: object
+      description: Reject spoofed read-only/unknown fields instead of silently ignoring
+        them.
+      properties:
+        kind:
+          $ref: '#/components/schemas/StepInputKindEnum'
+        title:
+          type: string
+          maxLength: 200
+        body:
+          type: string
+          default: ''
+          maxLength: 2000
+        delay_minutes:
+          type: integer
+          maximum: 43200
+          minimum: 0
+        grace_minutes:
+          type: integer
+          maximum: 1440
+          minimum: 1
+          default: 15
+      required:
+      - delay_minutes
+      - kind
+      - title
+    StepInputKindEnum:
+      enum:
+      - message
+      - task
+      type: string
+      description: |-
+        * `message` - message
+        * `task` - task
+    Submission:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        website:
+          type: string
+          readOnly: true
+        full_name:
+          type: string
+          readOnly: true
+        phone:
+          type: string
+          readOnly: true
+        email:
+          type: string
+          format: email
+          readOnly: true
+        course:
+          type: string
+          readOnly: true
+        message:
+          type: string
+          readOnly: true
+        page_url:
+          type: string
+          format: uri
+          readOnly: true
+        form_name:
+          type: string
+          readOnly: true
+        preferred_branch:
+          type: string
+          readOnly: true
+        training_mode:
+          type: string
+          readOnly: true
+        utm:
+          readOnly: true
+        branch:
+          type: string
+          format: uuid
+          readOnly: true
+        branch_name:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/SubmissionStatusEnum'
+          readOnly: true
+        lead:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+        lead_label:
+          type: string
+          readOnly: true
+          nullable: true
+        owner_name:
+          type: string
+          nullable: true
+          readOnly: true
+        review:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+        candidates:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - branch
+      - branch_name
+      - candidates
+      - course
+      - created_at
+      - email
+      - form_name
+      - full_name
+      - id
+      - lead
+      - lead_label
+      - message
+      - owner_name
+      - page_url
+      - phone
+      - preferred_branch
+      - review
+      - status
+      - training_mode
+      - utm
+      - website
+    SubmissionInput:
+      type: object
+      description: Reject spoofed read-only/unknown fields instead of silently ignoring
+        them.
+      properties:
+        submission_id:
+          type: string
+          pattern: ^[A-Za-z0-9_-]{1,100}$
+        full_name:
+          type: string
+          maxLength: 200
+        phone:
+          type: string
+          default: ''
+          maxLength: 40
+        email:
+          type: string
+          format: email
+          default: ''
+        course:
+          type: string
+          default: ''
+          maxLength: 180
+        message:
+          type: string
+          default: ''
+          maxLength: 2000
+        page_url:
+          type: string
+          format: uri
+          default: ''
+          maxLength: 1000
+        form_name:
+          type: string
+          default: ''
+          maxLength: 100
+        preferred_branch:
+          type: string
+          default: ''
+          maxLength: 100
+        branch_code:
+          type: string
+          default: ''
+          maxLength: 40
+          pattern: ^[-a-zA-Z0-9_]+$
+        training_mode:
+          type: string
+          default: ''
+          maxLength: 50
+        utm:
+          type: object
+          additionalProperties:
+            type: string
+            maxLength: 200
+      required:
+      - full_name
+      - submission_id
+    SubmissionStatusEnum:
+      enum:
+      - created
+      - review
+      - rejected
+      type: string
+      description: |-
+        * `created` - Enquiry created
+        * `review` - Identity review required
+        * `rejected` - Rejected after review
+    Task:
+      type: object
+      description: Reject spoofed read-only/unknown fields instead of silently ignoring
+        them.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        lead:
+          type: string
+          format: uuid
+        branch:
+          type: string
+          format: uuid
+          readOnly: true
+        assignee:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+        kind:
+          $ref: '#/components/schemas/TaskKindEnum'
+        title:
+          type: string
+          maxLength: 500
+        status:
+          allOf:
+          - $ref: '#/components/schemas/TaskStatusEnum'
+          readOnly: true
+        due_at:
+          type: string
+          format: date-time
+        assignment_version:
+          type: integer
+          readOnly: true
+        resolution:
+          type: string
+          readOnly: true
+        completed_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_by:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        overdue:
+          type: boolean
+          readOnly: true
+      required:
+      - assignee
+      - assignment_version
+      - branch
+      - completed_at
+      - created_at
+      - created_by
+      - due_at
+      - id
+      - kind
+      - lead
+      - overdue
+      - resolution
+      - status
+      - title
+    TaskKindEnum:
+      enum:
+      - acknowledgement
+      - follow_up
+      - callback
+      - appointment
+      - unassigned
+      - escalation
+      type: string
+      description: |-
+        * `acknowledgement` - Assignment acknowledgement
+        * `follow_up` - Follow-up
+        * `callback` - Missed-call callback
+        * `appointment` - Demo or counselling appointment
+        * `unassigned` - Unassigned enquiry alert
+        * `escalation` - Manager escalation
+    TaskStatusEnum:
+      enum:
+      - pending
+      - completed
+      - cancelled
+      - escalated
+      type: string
+      description: |-
+        * `pending` - Pending
+        * `completed` - Completed
+        * `cancelled` - Cancelled
+        * `escalated` - Escalated
+    Template:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        channel:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        language:
+          type: string
+          readOnly: true
+        status:
+          type: string
+          readOnly: true
+        body:
+          type: string
+          readOnly: true
+        parameter_count:
+          type: integer
+          readOnly: true
+        supported:
+          type: boolean
+          readOnly: true
+        synced_at:
+          type: string
+          format: date-time
+          readOnly: true
+        source_mode:
+          type: string
+          readOnly: true
+      required:
+      - body
+      - channel
+      - id
+      - language
+      - name
+      - parameter_count
+      - source_mode
+      - status
+      - supported
+      - synced_at
+    TrainingModeEnum:
+      enum:
+      - undecided
+      - online
+      - classroom
+      - hybrid
+      type: string
+      description: |-
+        * `undecided` - Undecided
+        * `online` - Online
+        * `classroom` - Classroom
+        * `hybrid` - Hybrid
+    TransferInput:
+      type: object
+      description: Reject spoofed read-only/unknown fields instead of silently ignoring
+        them.
+      properties:
+        lead:
+          type: string
+          format: uuid
+        branch:
+          type: string
+          format: uuid
+        reason:
+          type: string
+          maxLength: 2000
+      required:
+      - branch
+      - lead
+      - reason
+    Work:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        run:
+          type: string
+          format: uuid
+        name:
+          type: string
+        phone:
+          type: string
+        lead:
+          type: string
+          format: uuid
+          nullable: true
+        call:
+          type: string
+          format: uuid
+          nullable: true
+        conversation:
+          type: string
+          format: uuid
+          nullable: true
+        assignee:
+          type: string
+          format: uuid
+          nullable: true
+        assignee_name:
+          type: string
+          default: Manager queue
+        title:
+          type: string
+          maxLength: 200
+        due_at:
+          type: string
+          format: date-time
+        status:
+          type: string
+          maxLength: 12
+        resolution:
+          type: string
+          maxLength: 2000
+        overdue:
+          type: boolean
+          readOnly: true
+      required:
+      - call
+      - conversation
+      - due_at
+      - id
+      - lead
+      - name
+      - overdue
+      - phone
+      - run
+      - title
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid

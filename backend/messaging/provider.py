@@ -5,6 +5,7 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
 from urllib.request import Request, build_opener, HTTPRedirectHandler
 from django.conf import settings
+from .configuration import credentials, CredentialError
 
 
 class ProviderError(Exception):
@@ -22,16 +23,22 @@ class NoRedirect(HTTPRedirectHandler):
 
 
 def graph_request(resource, *, payload=None, params=None):
-    version = settings.WHATSAPP_GRAPH_VERSION
-    if not re.fullmatch(r'v\d+\.\d+', version) or not re.fullmatch(r'\d+/(messages|message_templates)', resource):
+    try:
+        config = credentials()
+    except CredentialError:
+        raise ProviderError('credential_storage_unavailable') from None
+    version = config['graph_version']
+    if not re.fullmatch(r'v\d+\.\d+', version) or not re.fullmatch(r'\d+/(messages|message_templates|phone_numbers)', resource):
         raise ProviderError('invalid_graph_configuration')
-    if not settings.WHATSAPP_ACCESS_TOKEN:
+    if resource.endswith('/phone_numbers') and payload is not None:
+        raise ProviderError('invalid_graph_configuration')
+    if not config['access_token']:
         raise ProviderError('missing_access_token')
     url = f'https://graph.facebook.com/{version}/{resource}'
     if params:
         url += '?' + urlencode(params)
     request = Request(url, data=json.dumps(payload).encode() if payload is not None else None,
-        headers={'Authorization': 'Bearer ' + settings.WHATSAPP_ACCESS_TOKEN, 'Content-Type': 'application/json'},
+        headers={'Authorization': 'Bearer ' + config['access_token'], 'Content-Type': 'application/json'},
         method='POST' if payload is not None else 'GET')
     try:
         # No redirects: credentials must never be forwarded to a different host.
@@ -100,3 +107,34 @@ def fetch_templates(channel):
             raise ProviderError('invalid_template_pagination')
         seen.add(cursor)
     raise ProviderError('template_pagination_limit')
+
+
+def check_connection(channel):
+    cursor, seen = None, set()
+    for _ in range(100):
+        data = graph_request(channel.waba_id + '/phone_numbers', params={
+            'fields': 'id,display_phone_number,verified_name', 'limit': 100,
+            **({'after': cursor} if cursor else {})})
+        if not isinstance(data.get('data'), list):
+            raise ProviderError('invalid_phone_number_response')
+        for item in data['data']:
+            if not isinstance(item, dict):
+                raise ProviderError('invalid_phone_number_response')
+            if str(item.get('id')) == channel.phone_number_id:
+                return {'connected': True, 'code': 'account_access_verified',
+                        'detail': 'Meta confirms access to this business account and phone number. Webhook delivery and sending permission must be checked separately.',
+                        'display_phone_number': str(item.get('display_phone_number', ''))[:40],
+                        'verified_name': str(item.get('verified_name', ''))[:150]}
+        paging = data.get('paging', {})
+        if not isinstance(paging, dict):
+            raise ProviderError('invalid_phone_number_response')
+        if not paging.get('next'):
+            raise ProviderError('phone_number_not_in_account')
+        cursors = paging.get('cursors', {})
+        if not isinstance(cursors, dict):
+            raise ProviderError('invalid_phone_number_pagination')
+        cursor = cursors.get('after')
+        if not isinstance(cursor, str) or not cursor or cursor in seen:
+            raise ProviderError('invalid_phone_number_pagination')
+        seen.add(cursor)
+    raise ProviderError('phone_number_pagination_limit')

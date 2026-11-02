@@ -65,7 +65,7 @@ function ContactLinkForm({ conversation, onClose }: { conversation: Conversation
   const contacts = useList<Contact>('/contacts/', { search });
   const link = useMutation({ mutationFn: () => api(`/whatsapp/conversations/${conversation.id}/link/`, { method: 'POST', body: { contact } }), onSuccess: () => { void client.invalidateQueries(); onClose(); } });
   return <form className="form-stack" onSubmit={e => { e.preventDefault(); link.mutate(); }}>
-    <Field title="Find contact"><input value={search} onChange={e => { setSearch(e.target.value); setContact(''); }} placeholder="Contact name or readable ID" maxLength={200} /></Field>
+    <Field title="Find contact"><input type="search" value={search} onChange={e => { setSearch(e.target.value); setContact(''); }} placeholder="Contact name or readable ID" maxLength={200} /></Field>
     <Field title="Contact"><select required value={contact} onChange={e => setContact(e.target.value)}><option value="">Choose a contact in this branch</option>{contacts.data?.results.filter(c => c.branch === conversation.branch).map(c => <option key={c.id} value={c.id}>{c.full_name} · {c.contact_id}</option>)}</select></Field>
     <p className="muted">Confirm the customer’s identity before linking. Existing contact links cannot be replaced.</p>
     <FormError error={contacts.error || link.error} /><button className="button primary" disabled={!contact || link.isPending}>Link contact</button>

@@ -17,7 +17,7 @@ from common.enquiries import LiveEnquiryView
 from messaging.api import WebhookView, ChannelViewSet, ConversationViewSet, MessageViewSet, TemplateViewSet
 from intake.api import WebsiteWebhook, WebsiteSubmissionViewSet
 from calls.api import CallViewSet
-from messaging.workspace import CannedViewSet, CampaignViewSet, AdViewSet, WorkspaceSettings
+from messaging.workspace import CannedViewSet, CampaignViewSet, AdViewSet, WorkspaceSettings, ConnectionCheck
 from automation.api import RuleViewSet, RunViewSet, WorkViewSet, EventViewSet
 from education.api import QualificationView, DemoViewSet, DemoTaskViewSet
 from education.monitor import AttentionView
@@ -75,6 +75,7 @@ urlpatterns = [
     path('api/v1/enquiry-dashboard/', LiveEnquiryView.as_view()),
     path('api/v1/whatsapp/webhook/', WebhookView.as_view()),
     path('api/v1/whatsapp/settings/', WorkspaceSettings.as_view()),
+    path('api/v1/whatsapp/settings/check/', ConnectionCheck.as_view()),
     path('api/v1/intake/websites/<slug:site>/', WebsiteWebhook.as_view(), name='website-intake'),
     path('api/v1/', include(router.urls)),
     path('api/v1/schema/', SpectacularAPIView.as_view(permission_classes=[IsAdminUser]), name='schema'),

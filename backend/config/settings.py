@@ -117,6 +117,7 @@ WHATSAPP_MODE = os.getenv('WHATSAPP_MODE', 'mock')
 if WHATSAPP_MODE not in ('mock', 'live'):
     raise ImproperlyConfigured('WHATSAPP_MODE must be mock or live.')
 WHATSAPP_LIVE_SENDS_ENABLED = boolean('WHATSAPP_LIVE_SENDS_ENABLED', False)
+WHATSAPP_ENCRYPTION_KEY = os.getenv('WHATSAPP_ENCRYPTION_KEY', '')
 WHATSAPP_ACCESS_TOKEN = os.getenv('WHATSAPP_ACCESS_TOKEN', '')
 WHATSAPP_APP_SECRET = os.getenv('WHATSAPP_APP_SECRET', '')
 WHATSAPP_VERIFY_TOKEN = os.getenv('WHATSAPP_VERIFY_TOKEN', '')

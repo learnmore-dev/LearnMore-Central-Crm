@@ -92,6 +92,40 @@ class RuleSerializer(StrictInputMixin, serializers.ModelSerializer):
         return services.save_rule(self.context['request'].user, data, instance)
 
 
+class StarterInstallInput(StrictInputMixin, serializers.Serializer):
+    branch = serializers.PrimaryKeyRelatedField(queryset=Branch.objects.none())
+    enable = serializers.BooleanField(default=False)
+
+    def get_fields(self):
+        fields = super().get_fields()
+        request = self.context.get('request')
+        fields['branch'].queryset = branch_scope(Branch.objects.filter(is_active=True), request.user, 'pk') if request else Branch.objects.none()
+        return fields
+
+
+class StarterTemplateSerializer(serializers.Serializer):
+    key = serializers.CharField()
+    name = serializers.CharField()
+    source = serializers.CharField()
+    description = serializers.CharField()
+    callback_minutes = serializers.IntegerField()
+    acknowledgement_text = serializers.CharField(allow_blank=True)
+    steps = StepInput(many=True)
+
+
+class StarterLibrarySerializer(serializers.Serializer):
+    templates = StarterTemplateSerializer(many=True)
+    courses = serializers.ListField(child=serializers.CharField())
+
+
+class StarterInstallResult(serializers.Serializer):
+    created = serializers.IntegerField()
+    enabled = serializers.IntegerField()
+    preserved = serializers.IntegerField()
+    conflicts = serializers.ListField(child=serializers.CharField())
+    rules = RuleSerializer(many=True)
+
+
 class RuleViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.CreateModelMixin, mixins.UpdateModelMixin, viewsets.GenericViewSet):
     serializer_class = RuleSerializer
     permission_classes = [SalesPermission]
@@ -104,6 +138,23 @@ class RuleViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.Creat
         super().check_permissions(request)
         if request.method not in ('GET', 'HEAD', 'OPTIONS') and not manager(request.user):
             self.permission_denied(request, message='Only managers can configure automation rules.')
+
+
+    @extend_schema(responses=StarterLibrarySerializer)
+    @action(detail=False, methods=['get'])
+    def templates(self, request):
+        from .presets import library
+        return Response(library())
+
+    @extend_schema(request=StarterInstallInput, responses=StarterInstallResult)
+    @action(detail=False, methods=['post'], url_path='install-starters')
+    def install_starters(self, request):
+        from .presets import install_starter_rules
+        values = StarterInstallInput(data=request.data, context={'request': request})
+        values.is_valid(raise_exception=True)
+        result = install_starter_rules(actor=request.user, **values.validated_data)
+        result['rules'] = RuleSerializer(result['rules'], many=True, context={'request': request}).data
+        return Response(result)
 
 
 class RunSerializer(serializers.ModelSerializer):

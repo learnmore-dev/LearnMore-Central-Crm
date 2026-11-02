@@ -16,6 +16,33 @@ Open **Automations** (`/automation`) to configure rules and review sequences. **
 - Overdue tasks escalate once to the manager dashboard queue. Completion requires a recorded outcome. The audit trail records enrollment, simulations, task creation/completion, reassignment, pause/stop/resume and escalation. Runs finish after scheduled steps and open tasks are complete.
 - Authenticated, branch-scoped REST endpoints under `/api/v1/automation/{rules,runs,work,audit}/`. Fields that should be system-controlled cannot be supplied by clients. APIs never return provider secrets.
 
+## LearnMore starter rules and course guide
+
+The Rules tab includes a LearnMore starter library. Managers select **Install starter rules**, choose an active authorized branch, and optionally select **Enable rules for new enquiries**. Unchecked installations remain drafts. Repeating installation preserves existing rule text and steps. An already-active custom rule for the same source is kept; the conflicting starter remains disabled and the result identifies that source. Enabled source-specific rules take priority over the general rule. Installing or enabling does not enroll historical records or resume paused sequences.
+
+| Rule | Automated work |
+| --- | --- |
+| General IT course enquiry | Ten-minute initial contact task; course-list acknowledgement preview; qualification after 30 minutes; course guide on day 1; syllabus/batch discussion on day 2; demo coordination on day 3; decision review on day 7. |
+| Website enquiry | Five-minute contact deadline, course guidance, demo offer and seven-day review. |
+| Incoming missed call | Five-minute callback task only; no message sequence for raw missed calls. |
+| WhatsApp enquiry | Ten-minute contact deadline, counselling and interest follow-up. Replies pause automation for human review. |
+| Walk-in/manual enquiry | Thirty-minute contact deadline, course-fit discussion, demo offer and seven-day decision review. |
+
+Message actions are audit previews, while task actions create real CRM work. Demo coordination asks staff to confirm candidate interest and trainer availability; it does not book a demo automatically. Business hours default to Monday–Saturday, 9 am–6 pm IST. The worker must be running for enrollment and scheduled work.
+
+The course guide includes Python and Java full stack, .NET full stack, Data Science, Data Analytics, AI, Machine Learning, AWS, Azure, DevOps, Software Testing, Selenium, Power BI, SQL and Advanced Excel, using names from the existing CRM catalogue. Staff can copy the guide and search the complete existing course catalogue on the page. Branch staff must confirm batch availability, syllabus and approved fees; templates make no fee or placement guarantees.
+
+API additions: `GET /api/v1/automation/rules/templates/` returns template previews and featured courses to sales users; manager-only `POST /api/v1/automation/rules/install-starters/` accepts `{ "branch": "<branch UUID>", "enable": false }` and reports created/enabled/preserved rules and source conflicts. Installation is transactional and locks the branch to coordinate with rule editing.
+
+The command uses the same installation service:
+
+```powershell
+# Install drafts in accessible active branches.
+.\.venv\Scripts\python.exe backend\manage.py seed_learnmore_rules --actor <manager-username>
+# Enable only the general course rule in one branch for new arrivals.
+.\.venv\Scripts\python.exe backend\manage.py seed_learnmore_rules --actor <manager-username> --branch marathahalli --source all --enable
+```
+
 ## Message safety and current limits
 
 **This release never sends messages.** A message action creates an audit preview labelled `SIMULATION ONLY — NOT SENT`. It does not create WhatsApp outbox rows, invoke a transport, mark a lead contacted or acknowledge assignment. This remains true even if the separate inbox is configured for live sending. No real calls, external emails or push notifications are triggered; manager alerts are durable CRM tasks.

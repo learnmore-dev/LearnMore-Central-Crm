@@ -26,20 +26,30 @@ from accounts.models import User
 from leads.models import Lead
 from .models import Channel, Conversation, Message, Template, WebhookDelivery
 from . import services
+from .configuration import credentials, CredentialError
+from .models import WhatsAppConnection
+from django.utils import timezone
 
 
 @method_decorator(csrf_exempt, name='dispatch')
 class WebhookView(View):
     """Meta is authenticated by raw-body HMAC, never a browser session."""
     def get(self, request):
-        expected = settings.WHATSAPP_VERIFY_TOKEN
+        try:
+            expected = credentials()['verify_token']
+        except CredentialError:
+            return HttpResponse(status=503)
         supplied = request.GET.get('hub.verify_token', '')
         if expected and request.GET.get('hub.mode') == 'subscribe' and hmac.compare_digest(expected.encode(), supplied.encode()):
+            WhatsAppConnection.objects.filter(pk=1).update(webhook_verified_at=timezone.now())
             return HttpResponse(request.GET.get('hub.challenge', ''), content_type='text/plain')
         return HttpResponse(status=403)
 
     def post(self, request):
-        secret = settings.WHATSAPP_APP_SECRET
+        try:
+            secret = credentials()['app_secret']
+        except CredentialError:
+            return HttpResponse(status=503)
         if not secret:
             return HttpResponse(status=503)
         try:

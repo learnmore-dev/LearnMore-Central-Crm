@@ -164,3 +164,18 @@ class AdDraft(models.Model):
 
     class Meta:
         ordering = ['-created_at', '-id']
+
+class WhatsAppConnection(models.Model):
+    """Single organization-wide encrypted credential configuration; sending gates stay server-owned."""
+    id = models.PositiveSmallIntegerField(primary_key=True, default=1, editable=False)
+    access_token_encrypted = models.TextField(blank=True)
+    app_secret_encrypted = models.TextField(blank=True)
+    verify_token_encrypted = models.TextField(blank=True)
+    graph_version = models.CharField(max_length=16, blank=True)
+    webhook_url = models.URLField(max_length=500, blank=True)
+    webhook_verified_at = models.DateTimeField(null=True, blank=True)
+    updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.PROTECT)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        constraints = [models.CheckConstraint(condition=models.Q(id=1), name='one_whatsapp_connection')]

@@ -19,9 +19,9 @@ output.mkdir(parents=True, exist_ok=True)
 venv = root / '.venv/bin'
 services = {
     'redis': (root, f'{redis} {root}/var/redis.conf', '', ''),
-    'backend': (root / 'backend', f'{venv}/gunicorn config.wsgi:application --bind 127.0.0.1:8100 --workers 2 --threads 2 --timeout 60', 'centralcrm-redis.service', ''),
+    'backend': (root / 'backend', f'{venv}/gunicorn config.wsgi:application --bind 127.0.0.1:8100 --workers 1 --threads 2 --timeout 60', 'centralcrm-redis.service', ''),
     'frontend': (root / 'frontend', f'{node} node_modules/next/dist/bin/next start --hostname 127.0.0.1 --port 3100', '', 'Environment=DJANGO_API_ORIGIN=http://127.0.0.1:8100\n'),
-    'worker': (root / 'backend', f'{venv}/celery -A config worker --loglevel=warning --concurrency=2 --hostname=centralcrm@%H', 'centralcrm-redis.service', ''),
+    'worker': (root / 'backend', f'{venv}/celery -A config worker --loglevel=warning --pool=solo --concurrency=1 --hostname=centralcrm@%H', 'centralcrm-redis.service', ''),
     'beat': (root / 'backend', f'{venv}/celery -A config beat --loglevel=warning --schedule={root}/var/celerybeat-schedule', 'centralcrm-redis.service', ''),
 }
 for name, (cwd, command, dependency, extra) in services.items():

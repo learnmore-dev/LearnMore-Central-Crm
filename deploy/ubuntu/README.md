@@ -19,6 +19,20 @@ sudo ss -ltnp
 
 Confirm DNS resolves to the EC2 address and ports 80, 443, 3100, 8100 and 6381 are available. Build resources depend on the instance; check memory before running the frontend build. Do not start services if these ports belong to other applications.
 
+## Initial deployment with low memory
+
+The service generator uses one Gunicorn worker with two threads and one sequential Celery worker, plus Redis, Next.js and one scheduler. This reduces process count for the initial low-load launch. A 1 GiB server can still run out of memory or become slow; monitor it alongside the existing PostgreSQL workload.
+
+Before building on the current server, add 2 GiB of swap:
+
+```bash
+sudo bash deploy/ubuntu/add_swap.sh
+swapon --show
+free -h
+```
+
+The helper creates `/centralcrm.swap` with private permissions and appends its own boot entry after activation succeeds. It refuses to overwrite an existing file or fstab entry and leaves existing swap and PostgreSQL configuration unchanged. It supports ext4 and XFS and requires at least 4 GiB free disk before creation. Swap is slower than RAM. If the build is killed or the database slows down, stop the build and build on a larger Linux machine of the same CPU architecture, or increase server memory. Avoid running a build while staff are using the application.
+
 ## Install runtime packages
 
 ```bash
@@ -26,6 +40,7 @@ cd ~/apps/centralcrm-test
 git pull --ff-only origin main
 sudo apt update
 sudo apt install -y python3-venv python3-pip curl ca-certificates xz-utils nginx certbot redis-server
+# Run this installer only if Node 22+ has not already been installed:
 bash deploy/ubuntu/install_node.sh
 export PATH="$HOME/.local/bin:$PATH"
 python3 -m venv .venv
@@ -98,6 +113,8 @@ sudo systemctl --no-pager status centralcrm-redis centralcrm-backend centralcrm-
 ```
 
 Gunicorn listens only on 8100, Next.js on 3100, and the private authenticated Redis process on 6381. Only Nginx exposes the website. Worker and scheduler use the same PostgreSQL settings as Gunicorn. Do not also run `run_local_jobs` or a second Celery beat scheduler. Redis persists its queue in `var/redis`.
+
+For the small server, inspect `free -h`, `vmstat 1 5`, and `systemctl --failed` after launch. Persistent swap activity, slow database queries or repeated worker restarts mean the instance needs more memory; low user counts alone do not guarantee sufficient capacity.
 
 ## Obtain HTTPS and configure Nginx
 

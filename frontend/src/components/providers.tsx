@@ -2,6 +2,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { QueryClient, QueryClientProvider, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api, ApiError } from '@/lib/api';
+import { clearSession } from '@/lib/session';
 import type { Profile } from '@/lib/types';
 import { LoginForm } from './login';
 import { ErrorState, Loading } from './ui';
@@ -11,7 +12,7 @@ function Session({ children }: { children: ReactNode }) {
   const client = useQueryClient();
   const session = useQuery({ queryKey: ['session'], queryFn: ({ signal }) => api<Profile | null>('/auth/me/', { signal }), retry: false });
   useEffect(() => {
-    const expire = () => { void client.cancelQueries(); client.removeQueries({ predicate: q => q.queryKey[0] !== 'session' }); client.setQueryData(['session'], null); };
+    const expire = () => { void clearSession(client); };
     window.addEventListener('crm-session-expired', expire);
     return () => window.removeEventListener('crm-session-expired', expire);
   }, [client]);

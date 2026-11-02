@@ -4,7 +4,8 @@ import { usePathname } from 'next/navigation';
 import { Fragment, useState, type ReactNode } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ArrowUpRight, Building2, CheckCheck, CircleHelp, ContactRound, GitBranch, History, LayoutDashboard, Layers3, LogOut, Menu, MessageSquare, PhoneIncoming, Users, X } from 'lucide-react';
-import { api } from '@/lib/api';
+import { api, isSessionExpired } from '@/lib/api';
+import { clearSession } from '@/lib/session';
 import { initials, label } from '@/lib/format';
 import { useUser } from './providers';
 import { WhatsAppNav } from './whatsapp-nav';
@@ -13,7 +14,14 @@ const allLinks = [['/', 'Overview', LayoutDashboard], ['/live-enquiries', 'Live 
 export function Shell({ children }: { children: ReactNode }) {
   const user = useUser(); const pathname = usePathname(); const [open, setOpen] = useState(false); const client = useQueryClient();
   const links = allLinks.filter(([href]) => !['/admin/employees', '/admin/google-contacts'].includes(href) || user.capabilities.manage_users).filter(([href]) => !['/attention', '/reports/follow-ups'].includes(href) || user.capabilities.global_scope || user.role === 'branch_manager').filter(([href]) => !['/demos', '/automation', '/my-work'].includes(href) || user.capabilities.sales_write).filter(([href]) => !['/inbox', '/whatsapp'].includes(href) || user.capabilities.global_scope || ['counsellor', 'branch_manager', 'support'].includes(user.role));
-  const logout = useMutation({ mutationFn: () => api('/auth/logout/', { method: 'POST' }), onSuccess: () => { client.clear(); client.setQueryData(['session'], null); } });
+  const logout = useMutation({
+    onMutate: () => client.cancelQueries(),
+    mutationFn: async () => {
+      try { await api('/auth/logout/', { method: 'POST' }); }
+      catch (error) { if (!isSessionExpired(error)) throw error; }
+    },
+    onSuccess: () => clearSession(client),
+  });
   const name = [user.first_name, user.last_name].filter(Boolean).join(' ') || user.username;
   return <div className="app-shell"><a className="skip-link" href="#main-content">Skip to content</a>{open && <button className="nav-scrim" aria-label="Close navigation" onClick={() => setOpen(false)} />}<aside className={`sidebar ${open ? 'is-open' : ''}`}><Link href="/" className="brand"><span className="brand-mark"><Layers3 size={25} /></span><span>LearnMore<span className="brand-sub">CONNECT</span></span></Link><button className="mobile-close icon-button" aria-label="Close navigation" onClick={() => setOpen(false)}><X /></button><div className="workspace-label"><span className="workspace-icon">L</span><span>LearnMore Technologies<small>Staff workspace</small></span></div><span className="nav-caption">WORKSPACE</span><nav aria-label="Main navigation">{links.map(([href, title, Icon]) => { if (href === '/whatsapp') return <WhatsAppNav key={href} pathname={pathname} onNavigate={() => setOpen(false)} />; const active = href === '/' ? pathname === '/' : pathname.startsWith(href); return <Fragment key={href}>{navigationGroups[href] && <span className="nav-group-title">{navigationGroups[href]}</span>}<Link href={href} onClick={() => setOpen(false)} aria-current={active ? 'page' : undefined} className={`nav-link ${active ? 'active' : ''}`}><Icon size={19} /><span>{title}</span>{active && <span className="nav-dot" />}</Link></Fragment>; })}</nav><div className="sidebar-bottom"><div className="support-card"><CircleHelp size={20} /><strong>Here to help you grow.</strong><p>For workspace access or support, reach out to your administrator.</p></div><span className="sidebar-foot">LearnMore Connect <ArrowUpRight size={14} /></span></div></aside><div className="app-body"><header className="topbar"><div className="topbar-left"><button className="icon-button menu-button" aria-label="Open navigation" onClick={() => setOpen(true)}><Menu size={21} /></button><span className="breadcrumb">Workspace <span>/</span> <strong>{links.find(([href]) => href !== '/' && pathname.startsWith(href))?.[1] || 'Overview'}</strong></span></div><div className="topbar-right"><span className="role-label">{label(user.role)}</span><Link className="user-chip" href="/profile" title="Your profile"><span className="avatar small">{initials(name)}</span><span>{name}</span></Link><button className="icon-button" aria-label="Sign out" title="Sign out" onClick={() => logout.mutate()} disabled={logout.isPending}><LogOut size={18} /></button></div></header>{logout.error && <div className="logout-error" role="alert">{logout.error.message}</div>}<main id="main-content" className="page-content">{children}</main><footer className="app-footer"><span>LearnMore Technologies</span><span>Connected to your CRM · Times shown in IST unless indicated</span></footer></div></div>;
 }

@@ -66,7 +66,12 @@ class ProfileView(APIView):
     def get(self, request):
         return Response(ProfileSerializer(request.user).data)
 
+@method_decorator(csrf_protect, name='dispatch')
 class LogoutView(APIView):
+    # Signing out an already expired session is still a successful logout.
+    # Explicit CSRF protection also covers anonymous requests.
+    permission_classes = [AllowAny]
+
     @extend_schema(request=None, responses={204: None})
     def post(self, request):
         logout(request)

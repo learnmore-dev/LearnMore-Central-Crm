@@ -10,6 +10,10 @@ export class ApiError extends Error {
     this.name = 'ApiError';
   }
 }
+export function isSessionExpired(error: unknown): error is ApiError {
+  return error instanceof ApiError && (error.status === 401 ||
+    (error.status === 403 && error.message.includes('Authentication credentials were not provided')));
+}
 export async function api<T>(path: string, options: { method?: string; body?: unknown; signal?: AbortSignal } = {}): Promise<T> {
   if (!path.startsWith('/') || path.startsWith('//') || path.includes('://') || path.includes('..')) throw new Error('Invalid CRM API path.');
   const method = options.method || 'GET';
@@ -34,8 +38,7 @@ export async function api<T>(path: string, options: { method?: string; body?: un
   }
   if (!response.ok) {
     const error = new ApiError(response.status, data);
-    if (typeof window !== 'undefined' && !path.startsWith('/auth/login') &&
-      (response.status === 401 || (response.status === 403 && error.message.includes('Authentication credentials were not provided')))) window.dispatchEvent(new Event('crm-session-expired'));
+    if (typeof window !== 'undefined' && !path.startsWith('/auth/login') && isSessionExpired(error)) window.dispatchEvent(new Event('crm-session-expired'));
     throw error;
   }
   return data as T;

@@ -40,6 +40,25 @@ class AuthenticationTests(TestCase):
         self.assertEqual(invalid.status_code, 401)
         self.assertEqual(inactive.json(), invalid.json())
 
+    def test_logout_is_idempotent_but_still_requires_csrf(self):
+        self.assertEqual(self.client.post('/api/v1/auth/logout/').status_code, 403)
+        token = self.csrf()
+        for _ in range(2):
+            self.assertEqual(self.client.post('/api/v1/auth/logout/', HTTP_X_CSRFTOKEN=token).status_code, 204)
+        self.assertEqual(self.client.get('/api/v1/auth/me/').status_code, 403)
+
+    def test_logout_succeeds_after_session_expires(self):
+        from django.contrib.sessions.models import Session
+        self.client.force_login(self.user)
+        token = self.csrf()
+        Session.objects.all().delete()
+        self.assertEqual(self.client.post('/api/v1/auth/logout/', HTTP_X_CSRFTOKEN=token).status_code, 204)
+        self.assertEqual(self.client.get('/api/v1/auth/me/').status_code, 403)
+
+    def test_anonymous_logout_rejects_cross_origin_requests(self):
+        self.assertEqual(self.client.post('/api/v1/auth/logout/', HTTP_X_CSRFTOKEN=self.csrf(),
+                                         HTTP_ORIGIN='https://untrusted.example').status_code, 403)
+
     def test_login_validation_and_throttling(self):
         token = self.csrf()
         self.assertEqual(self.client.post('/api/v1/auth/login/', {}, HTTP_X_CSRFTOKEN=token).status_code, 400)

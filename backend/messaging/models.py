@@ -55,6 +55,7 @@ class Template(models.Model):
     name = models.CharField(max_length=512)
     language = models.CharField(max_length=20)
     status = models.CharField(max_length=40)
+    category = models.CharField(max_length=40, blank=True, default='')
     body = models.TextField(blank=True)
     parameter_count = models.PositiveSmallIntegerField(default=0)
     supported = models.BooleanField(default=False)

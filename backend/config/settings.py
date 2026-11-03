@@ -93,6 +93,7 @@ SPECTACULAR_SETTINGS = {
         'ActivityKindEnum': 'activities.schema.activity_kinds',
         'AutomationRuleSourceEnum': 'automation.schema.rule_sources',
         'SourceEnum': 'contacts.schema.sources',
+        'LeadStatusEnum': 'leads.schema.lead_statuses',
     },
 }
 # Single-process development cache only. Before multi-worker deployment, use a shared

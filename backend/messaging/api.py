@@ -13,7 +13,9 @@ from rest_framework.decorators import action
 from rest_framework.permissions import BasePermission, SAFE_METHODS
 from rest_framework.response import Response
 from rest_framework.validators import UniqueValidator
-from drf_spectacular.utils import extend_schema
+from rest_framework.throttling import UserRateThrottle
+from django.db.models import Q
+from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter
 from branches.models import Branch
 from contacts.models import Contact
 from contacts.api import ResolveSerializer
@@ -312,19 +314,80 @@ class ConversationViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, view
 class TemplateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Template
-        fields = ['id', 'channel', 'name', 'language', 'status', 'body', 'parameter_count', 'supported', 'synced_at', 'source_mode']
+        fields = ['id', 'channel', 'name', 'language', 'status', 'category', 'body', 'parameter_count', 'supported', 'synced_at', 'source_mode']
         read_only_fields = fields
 
 
+TEMPLATE_CATEGORIES = ['UTILITY', 'MARKETING', 'AUTHENTICATION']
+TEMPLATE_STATUSES = ['APPROVED', 'PENDING', 'REJECTED', 'PAUSED', 'DISABLED', 'IN_APPEAL', 'PENDING_DELETION', 'DELETED', 'MISSING']
+
+
+class TemplateSyncInput(StrictInputMixin, serializers.Serializer):
+    channel = serializers.UUIDField()
+
+
+class TemplateSyncResult(serializers.Serializer):
+    count = serializers.IntegerField()
+    synced_at = serializers.DateTimeField()
+
+
+class TemplateSyncThrottle(UserRateThrottle):
+    scope = 'whatsapp_template_sync'
+    rate = '5/min'
+
+
+def filter_template_values(rows, params, field, known):
+    raw = params.get(field, '').strip()
+    if not raw:
+        return rows
+    values = raw.split(',')
+    if len(values) > len(known) + 1 or any(value not in [*known, 'OTHER'] for value in values):
+        raise serializers.ValidationError({field: 'Choose valid template filter values.'})
+    query = Q(**{field + '__in': [value for value in values if value != 'OTHER']})
+    if 'OTHER' in values:
+        query |= ~Q(**{field + '__in': known})
+    return rows.filter(query)
+
+
+@extend_schema_view(list=extend_schema(parameters=[
+    OpenApiParameter('channel', str, description='Filter by business account UUID.'),
+    OpenApiParameter('category', str, description='Comma-separated UTILITY, MARKETING, AUTHENTICATION or OTHER. Omit for all categories.'),
+    OpenApiParameter('status', str, description='Comma-separated approval statuses: APPROVED, PENDING, REJECTED, PAUSED, DISABLED, IN_APPEAL, PENDING_DELETION, DELETED, MISSING or OTHER.'),
+]))
 class TemplateViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     serializer_class = TemplateSerializer
     permission_classes = [InboxPermission]
 
     def get_queryset(self):
-        rows = branch_scope(Template.objects.all(), self.request.user, 'channel__branch_id')
+        rows = branch_scope(Template.objects.select_related('channel'), self.request.user, 'channel__branch_id')
         if self.request.query_params.get('channel'):
             rows = rows.filter(channel_id=serializers.UUIDField().run_validation(self.request.query_params['channel']))
-        return rows
+        rows = filter_template_values(rows, self.request.query_params, 'category', TEMPLATE_CATEGORIES)
+        return filter_template_values(rows, self.request.query_params, 'status', TEMPLATE_STATUSES)
+
+    @extend_schema(request=TemplateSyncInput, responses=TemplateSyncResult)
+    @action(detail=False, methods=['post'], throttle_classes=[TemplateSyncThrottle])
+    def sync(self, request):
+        from django.shortcuts import get_object_or_404
+        from .provider import ProviderError
+        if not has_global_scope(request.user):
+            self.permission_denied(request, message='Only an organization administrator can sync Meta templates.')
+        form = TemplateSyncInput(data=request.data)
+        form.is_valid(raise_exception=True)
+        channel = get_object_or_404(branch_scope(Channel.objects.filter(is_active=True, branch__is_active=True), request.user), pk=form.validated_data['channel'])
+        try:
+            count = services.sync_templates(channel)
+        except ProviderError as error:
+            messages = {
+                'missing_access_token': 'Configure a Meta access token in WhatsApp Settings before syncing.',
+                'invalid_graph_configuration': 'Check the Graph API version and business account ID in WhatsApp Settings and Accounts.',
+                'credential_storage_unavailable': 'Saved credentials could not be opened. Check the server encryption configuration.',
+                'graph_190': 'Meta rejected the access token. Check whether it is expired or revoked.',
+                'graph_10': 'The access token does not have permission to read this business account’s templates.',
+                'graph_200': 'The access token does not have permission to read this business account’s templates.',
+            }
+            raise serializers.ValidationError({'detail': messages.get(error.code, 'Meta template sync failed. Check the connection and try again.'), 'code': error.code}) from None
+        return Response({'count': count, 'synced_at': timezone.now()})
 
 
 class MessageSerializer(serializers.ModelSerializer):

@@ -7,6 +7,9 @@ from common.deadlines import DeadlineTracked
 class Qualification(models.Model):
     lead = models.OneToOneField('leads.Lead', primary_key=True, on_delete=models.PROTECT, related_name='qualification')
     course_interest = models.CharField(max_length=200, blank=True)
+    course_interests = models.JSONField(default=list, blank=True)
+    city = models.CharField(max_length=120, blank=True)
+    preferred_branch = models.ForeignKey('branches.Branch', null=True, blank=True, on_delete=models.PROTECT, related_name='preferred_qualifications')
     background = models.CharField(max_length=20, choices=[('unknown', 'Not captured'), ('student', 'Student'), ('working', 'Working professional'), ('job_seeker', 'Job seeker'), ('other', 'Other')], default='unknown')
     training_mode = models.CharField(max_length=12, choices=[('undecided', 'Undecided'), ('online', 'Online'), ('classroom', 'Classroom'), ('hybrid', 'Hybrid')], default='undecided')
     preferred_location = models.CharField(max_length=120, blank=True)

@@ -19,7 +19,7 @@ from intake.api import WebsiteWebhook, WebsiteSubmissionViewSet
 from calls.api import CallViewSet
 from messaging.workspace import CannedViewSet, CampaignViewSet, AdViewSet, WorkspaceSettings, ConnectionCheck
 from automation.api import RuleViewSet, RunViewSet, WorkViewSet, EventViewSet
-from education.api import QualificationView, DemoViewSet, DemoTaskViewSet
+from education.api import PreferredBranchesView, QualificationView, DemoViewSet, DemoTaskViewSet
 from education.monitor import AttentionView
 from education.reports import FunnelReportView
 from education.workday import WorkdayView
@@ -61,6 +61,7 @@ router.register('whatsapp/canned-messages', CannedViewSet, basename='whatsapp-ca
 router.register('whatsapp/campaigns', CampaignViewSet, basename='whatsapp-campaign')
 router.register('whatsapp/ad-drafts', AdViewSet, basename='whatsapp-ad-draft')
 urlpatterns = [
+    path('api/v1/education/preferred-branches/', PreferredBranchesView.as_view()),
     path('api/v1/follow-up-report/', FollowUpReportView.as_view()),
     path('api/v1/education/funnel/', FunnelReportView.as_view()),
     path('api/v1/education/workday/', WorkdayView.as_view()),

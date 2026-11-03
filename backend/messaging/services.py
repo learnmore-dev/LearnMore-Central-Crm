@@ -325,23 +325,35 @@ def process_webhooks(limit=100):
 
 
 def sync_templates(channel):
-    rows = fetch_templates(channel)  # fetch all pages before replacing local approvals
+    if not channel.is_active or not channel.branch.is_active:
+        raise ProviderError('inactive_template_account')
+    rows = fetch_templates(channel)  # Fetch and validate every page before changing approvals.
     prepared = []
     for row in rows:
+        if not isinstance(row, dict) or not all(isinstance(row.get(key), str) and row[key]
+                for key in ('id', 'name', 'language', 'status')):
+            raise ProviderError('invalid_template_record')
+        category = row.get('category', '')
         components = row.get('components', [])
+        if not isinstance(category, str) or len(category) > 40 or not isinstance(components, list) or any(not isinstance(c, dict) for c in components):
+            raise ProviderError('invalid_template_record')
+        if any(len(row[key]) > maximum for key, maximum in [('id', 100), ('name', 512), ('language', 20), ('status', 40)]):
+            raise ProviderError('invalid_template_record')
         body = next((c.get('text', '') for c in components if c.get('type') == 'BODY'), '')
+        if not isinstance(body, str):
+            raise ProviderError('invalid_template_record')
         slots = re.findall(r'\{\{(\d+)\}\}', body)
         indexes = sorted(set(int(i) for i in slots))
         supported = bool(body) and all(c.get('type') in ('BODY', 'FOOTER') for c in components)
         supported = supported and indexes == list(range(1, len(indexes)+1)) and '{{' not in re.sub(r'\{\{\d+\}\}', '', body)
-        if not all(isinstance(row.get(key), str) and row[key] for key in ('id', 'name', 'language', 'status')):
-            raise ProviderError('invalid_template_record')
-        prepared.append((row, body, len(indexes), supported))
+        prepared.append((row, category.strip().upper(), body, len(indexes), supported))
     with transaction.atomic():
-        Channel.objects.select_for_update().get(pk=channel.pk)
-        Template.objects.filter(channel=channel).update(status='MISSING')
-        for row, body, count, supported in prepared:
+        channel = Channel.objects.select_for_update().select_related('branch').get(pk=channel.pk)
+        if not channel.is_active or not channel.branch.is_active:
+            raise ProviderError('inactive_template_account')
+        Template.objects.filter(channel=channel).exclude(source_mode='mock').update(status='MISSING')
+        for row, category, body, count, supported in prepared:
             Template.objects.update_or_create(channel=channel, name=row['name'], language=row['language'], defaults={
-                'provider_id': row['id'], 'status': row['status'], 'body': body, 'parameter_count': count,
+                'provider_id': row['id'], 'status': row['status'], 'category': category, 'body': body, 'parameter_count': count,
                 'supported': supported, 'synced_at': timezone.now(), 'source_mode': 'live'})
     return len(prepared)

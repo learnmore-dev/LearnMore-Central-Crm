@@ -22,11 +22,41 @@ def event(lead, body, actor=None):
     Activity.objects.create(lead=lead, contact=lead.contact, branch=lead.branch, actor=actor, kind='note', body=body)
 
 
+def normalized_interests(lead, data, existing=None):
+    primary = data.get('course_interest') or (existing.course_interest if existing else '') or lead.title
+    interests = data.get('course_interests')
+    if interests is None:
+        interests = list(existing.course_interests) if existing and existing.course_interests else []
+        if primary not in interests:
+            interests.insert(0, primary)
+    if not isinstance(interests, list) or not 1 <= len(interests) <= 20 or any(
+            not isinstance(value, str) or not value.strip() or len(value) > 200 for value in interests):
+        raise ValidationError({'course_interests': 'Choose between 1 and 20 course interests.'})
+    interests = [value.strip() for value in interests]
+    if len({value.casefold() for value in interests}) != len(interests):
+        raise ValidationError({'course_interests': 'Select each course only once.'})
+    if primary not in interests:
+        raise ValidationError({'course_interest': 'The primary course must be one of the selected interests.'})
+    return primary, interests
+
+
 @transaction.atomic
-def save_qualification(actor, lead, data):
+def save_qualification(actor, lead, data, *, initial=False):
     lead, _ = lock_lead(lead.pk)
-    authorize(actor, lead)
-    item, _ = Qualification.objects.update_or_create(lead=lead, defaults={**data, 'updated_by': actor})
+    if initial:
+        require_branch(actor, lead.branch)
+    else:
+        authorize(actor, lead)
+    existing = Qualification.objects.filter(lead=lead).first()
+    primary, interests = normalized_interests(lead, data, existing)
+    preferred = data.get('preferred_branch')
+    if preferred is not None and not preferred.is_active:
+        raise ValidationError({'preferred_branch': 'Choose an active preferred branch.'})
+    if primary != lead.title:
+        from leads.services import update_lead
+        lead = update_lead(actor=actor, lead=lead, title=primary)
+    item, _ = Qualification.objects.update_or_create(lead=lead, defaults={
+        **data, 'course_interest': primary, 'course_interests': interests, 'updated_by': actor})
     event(lead, 'Student qualification updated: ' + ', '.join(sorted(data)) + '.', actor)
     return item
 

@@ -70,6 +70,18 @@ def update_lead(*, actor, lead, **data):
         was_active = lead.status in ACTIVE
         for key in changed:
             setattr(lead, key, data[key])
+        if 'title' in changed:
+            from education.models import Qualification
+            qualification = Qualification.objects.filter(lead=lead).first()
+            if qualification:
+                interests = list(qualification.course_interests or [])
+                if lead.title not in interests:
+                    interests = [lead.title if value == qualification.course_interest else value for value in interests]
+                    if lead.title not in interests:
+                        if len(interests) >= 20:
+                            raise ValidationError({'title': 'Remove a course interest before adding another primary course.'})
+                        interests.insert(0, lead.title)
+                Qualification.objects.filter(lead=lead).update(course_interest=lead.title, course_interests=interests, updated_by=actor)
         lead.save(update_fields=changed + ['updated_at'])
         Activity.objects.create(contact=lead.contact, lead=lead, branch=lead.branch, actor=actor,
             kind=Activity.Kind.LEAD_UPDATED, body='Updated fields: %s. Status: %s.' % (', '.join(sorted(changed)), lead.status))

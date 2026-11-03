@@ -22,10 +22,10 @@ describe('Edtech counselling workflow', () => {
     const lead = { id: 'lead', title: 'Python' } as Lead;
     const data = { lead: 'lead', updated_at: null, course_interest: '', background: 'unknown', training_mode: 'undecided', preferred_location: '', preferred_schedule: 'undecided', joining_timeline: 'undecided', readiness: 'exploring', notes: '', missing_fields: ['course_interest'] } as Qualification;
     wrap(<QualificationForm lead={lead} data={data} onClose={vi.fn()} />); const user = userEvent.setup();
-    await user.selectOptions(screen.getByLabelText('Training Mode'), 'online');
+    await user.selectOptions(screen.getByLabelText('Training mode'), 'online');
     await user.selectOptions(screen.getByLabelText('Joining Timeline'), 'month');
     await user.click(screen.getByRole('button', { name: 'Save qualification' }));
-    const request = vi.mocked(api).mock.calls[0][1]!;
+    const request = vi.mocked(api).mock.calls.find(([, options]) => options?.method === 'PATCH')![1]!;
     expect(request.body).toMatchObject({ course_interest: 'Python', training_mode: 'online', joining_timeline: 'month' });
     expect(request.body).not.toHaveProperty('lead');
     expect(request.body).not.toHaveProperty('updated_at');

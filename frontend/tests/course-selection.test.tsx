@@ -85,13 +85,13 @@ describe('student course selection', () => {
     render(<QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
       <LeadForm contact="student-contact" onClose={close} />
     </QueryClientProvider>);
-    await within(screen.getByLabelText('Branch')).findByRole('option', { name: 'Central' }, { timeout: 3000 });
+    await within(screen.getByLabelText('Assigned branch')).findByRole('option', { name: 'Central' }, { timeout: 3000 });
     const user = userEvent.setup();
     await user.click(screen.getByRole('combobox', { name: /Course name/ }));
     await user.click(screen.getByRole('option', { name: 'Python Full Stack Development' }));
     await user.click(screen.getByRole('button', { name: 'Create enquiry' }));
     await waitFor(() => expect(api).toHaveBeenCalledWith('/leads/', {
-      method: 'POST', body: { contact: 'student-contact', title: 'Python Full Stack Development', branch: 'branch' },
+      method: 'POST', body: { contact: 'student-contact', title: 'Python Full Stack Development', branch: 'branch', source: 'manual', qualification: { course_interest: 'Python Full Stack Development', course_interests: ['Python Full Stack Development'], training_mode: 'undecided', city: '', preferred_branch: null } },
     }));
     await waitFor(() => expect(navigation.push).toHaveBeenCalledWith('/leads/new-enquiry'));
     expect(close).toHaveBeenCalled();

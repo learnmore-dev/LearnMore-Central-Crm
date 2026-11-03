@@ -90,19 +90,22 @@ def send_message(message):
 
 def fetch_templates(channel):
     """Read-only; no mock approvals are ever inferred from real credentials."""
-    if settings.WHATSAPP_MODE != 'live':
-        raise ProviderError('template_sync_requires_live_mode')
     rows, cursor, seen = [], None, set()
     for _ in range(100):
         data = graph_request(channel.waba_id + '/message_templates', params={
-            'fields': 'id,name,language,status,components', 'limit': 100, **({'after': cursor} if cursor else {})})
+            'fields': 'id,name,language,status,category,components', 'limit': 100, **({'after': cursor} if cursor else {})})
         if not isinstance(data.get('data'), list):
             raise ProviderError('invalid_template_response')
         rows.extend(data['data'])
         paging = data.get('paging', {})
+        if not isinstance(paging, dict):
+            raise ProviderError('invalid_template_pagination')
         if not paging.get('next'):
             return rows
-        cursor = paging.get('cursors', {}).get('after')
+        cursors = paging.get('cursors', {})
+        if not isinstance(cursors, dict):
+            raise ProviderError('invalid_template_pagination')
+        cursor = cursors.get('after')
         if not isinstance(cursor, str) or not cursor or cursor in seen:
             raise ProviderError('invalid_template_pagination')
         seen.add(cursor)

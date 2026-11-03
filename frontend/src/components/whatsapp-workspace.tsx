@@ -1,5 +1,6 @@
 'use client';
 import Image from 'next/image';
+import { WhatsAppTemplates } from './whatsapp-templates';
 import { WhatsAppSettings } from './whatsapp-settings';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -41,15 +42,6 @@ function Accounts() {
   return <><PageHeader title="WhatsApp accounts" description="Business-number configuration and branch access. Configured accounts still require a verified Meta connection.">{user.capabilities.global_scope && <button className="button primary" onClick={() => setEditor('new')}>Add account</button>}</PageHeader><section className="panel">{rows.isPending ? <Loading /> : rows.error ? <ErrorState error={rows.error} retry={() => void rows.refetch()} /> : rows.data && <>{rows.data.results.length ? <div className="table-wrap"><table><thead><tr><th>Account</th><th>Business number</th><th>Meta IDs</th><th>Status</th><th>Manage</th></tr></thead><tbody>{rows.data.results.map(c => <tr key={c.id}><td><strong>{c.name}</strong><small className="cell-line">{c.branch_name}</small></td><td>{c.business_phone || 'Not set'}</td><td><small>Phone: {c.phone_number_id}</small><small className="cell-line">WABA: {c.waba_id}</small></td><td><Badge value={c.is_active ? 'active' : 'inactive'}>{c.is_active ? 'Enabled locally' : 'Disabled'}</Badge></td><td>{user.capabilities.global_scope && <button className="button secondary small" onClick={() => setEditor(c)}>Edit account</button>}</td></tr>)}</tbody></table></div> : <Empty title="No WhatsApp accounts configured">Add a business account before creating templates, campaigns or chat links.</Empty>}<Pager page={page} setPage={setPage} data={rows.data} /></>}</section>{editor && <Modal title={editor === 'new' ? 'Add WhatsApp account' : 'Edit WhatsApp account'} onClose={() => setEditor(null)}><AccountForm item={editor === 'new' ? null : editor} close={() => setEditor(null)} /></Modal>}</>;
 }
 
-function Templates() {
-  const user = useUser(); const refresh = useRefresh(); const [page, setPage] = useState(1); const [channel, setChannel] = useState('');
-  const accounts = useList<Channel>('/whatsapp/channels/'); const settings = useRecord<Settings>('/whatsapp/settings/'); const rows = useList<Template>('/whatsapp/templates/', { page, channel });
-  const mock = useMutation({ mutationFn: () => api(`/whatsapp/channels/${channel}/mock-template/`, { method: 'POST' }), onSuccess: refresh });
-  return <><PageHeader title="Message templates" description="Browse synced approvals and supported text templates. Meta approval can only come from an authenticated provider sync." />
-    <section className="panel"><div className="panel-toolbar"><Field title="Business account"><select value={channel} onChange={e => { setChannel(e.target.value); setPage(1); }}><option value="">All authorized accounts</option>{accounts.data?.results.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}</select></Field>{user.capabilities.global_scope && settings.data?.mode === 'mock' && <button className="button secondary" disabled={!channel || mock.isPending} onClick={() => mock.mutate()}>Install mock template</button>}</div><FormError error={mock.error || accounts.error || settings.error} />
-      {rows.isPending ? <Loading /> : rows.error ? <ErrorState error={rows.error} retry={() => void rows.refetch()} /> : rows.data && <>{rows.data.results.length ? <div className="table-wrap"><table><thead><tr><th>Template</th><th>Content</th><th>Approval</th><th>Mode / sync</th></tr></thead><tbody>{rows.data.results.map(t => <tr key={t.id}><td><strong>{t.name}</strong><small className="cell-line">{t.language} · {t.parameter_count} parameters</small></td><td className="wa-wrap-cell">{t.body}</td><td><Badge value={t.status.toLowerCase()}>{t.status}</Badge><small className="cell-line">{t.supported ? 'Supported text format' : 'Unsupported components'}</small></td><td>{t.source_mode}<small className="cell-line">{date(t.synced_at)}</small></td></tr>)}</tbody></table></div> : <Empty title="No templates synced">In mock mode, select an account and install a simulation template. Live approvals use the server sync command.</Empty>}<Pager page={page} setPage={setPage} data={rows.data} /></>}
-    </section></>;
-}
 
 function Trail() {
   type Row = { id: string; recipient: string; channel_name: string; direction: string; text: string; template_name: string | null; queue_status: string; delivery_status: string; mode: string; error_code: string; occurred_at: string; conversation: string };
@@ -104,5 +96,5 @@ function Ads() {
 
 
 export function WhatsAppWorkspace({ section }: { section: string }) {
-  switch (section) { case 'accounts': return <Accounts />; case 'templates': return <Templates />; case 'message-trail': return <Trail />; case 'canned-messages': return <CannedMessages />; case 'campaigns': return <Campaigns />; case 'chat-widget': return <ChatWidget />; case 'ads': return <Ads />; default: return <WhatsAppSettings />; }
+  switch (section) { case 'accounts': return <Accounts />; case 'templates': return <WhatsAppTemplates />; case 'message-trail': return <Trail />; case 'canned-messages': return <CannedMessages />; case 'campaigns': return <Campaigns />; case 'chat-widget': return <ChatWidget />; case 'ads': return <Ads />; default: return <WhatsAppSettings />; }
 }

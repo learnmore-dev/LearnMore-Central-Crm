@@ -10,6 +10,7 @@ from common.serializers import StrictInputMixin
 from automation.api import SalesPermission, manager
 from leads.models import Lead
 from .models import Qualification, Demo, DemoTask
+from branches.models import Branch
 from . import services
 
 
@@ -22,10 +23,25 @@ def visible_leads(user):
 
 class QualificationSerializer(StrictInputMixin, serializers.ModelSerializer):
     missing_fields = serializers.SerializerMethodField()
+    course_interests = serializers.ListField(child=serializers.CharField(max_length=200), max_length=20, allow_empty=False, required=False)
+    preferred_branch = serializers.PrimaryKeyRelatedField(queryset=Branch.objects.filter(is_active=True), allow_null=True, required=False)
+    preferred_branch_name = serializers.CharField(source='preferred_branch.name', read_only=True, allow_null=True)
+
+    def validate_course_interests(self, values):
+        if len({value.casefold() for value in values}) != len(values):
+            raise serializers.ValidationError('Select each course only once.')
+        return values
+
+    def to_representation(self, instance):
+        result = super().to_representation(instance)
+        if not result['course_interests']:
+            primary = instance.course_interest or instance.lead.title
+            result['course_interests'] = [primary] if primary else []
+        return result
 
     class Meta:
         model = Qualification
-        fields = ['lead', 'course_interest', 'background', 'training_mode', 'preferred_location', 'preferred_schedule', 'joining_timeline', 'readiness', 'notes', 'updated_at', 'missing_fields']
+        fields = ['lead', 'course_interest', 'course_interests', 'city', 'preferred_branch', 'preferred_branch_name', 'background', 'training_mode', 'preferred_location', 'preferred_schedule', 'joining_timeline', 'readiness', 'notes', 'updated_at', 'missing_fields']
         read_only_fields = ['lead', 'updated_at']
 
     def get_missing_fields(self, obj) -> list[str]:
@@ -145,3 +161,18 @@ class DemoTaskViewSet(viewsets.ReadOnlyModelViewSet):
         data.is_valid(raise_exception=True)
         item = services.complete_demo_task(request.user, self.get_object(), **data.validated_data)
         return Response(self.get_serializer(item).data)
+
+
+class PreferredBranchSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Branch
+        fields = ['id', 'name']
+
+
+class PreferredBranchesView(APIView):
+    permission_classes = [SalesPermission]
+
+    @extend_schema(responses=PreferredBranchSerializer(many=True))
+    def get(self, request):
+        # Preference metadata only: choosing it grants no access or branch transfer.
+        return Response(PreferredBranchSerializer(Branch.objects.filter(is_active=True), many=True).data)

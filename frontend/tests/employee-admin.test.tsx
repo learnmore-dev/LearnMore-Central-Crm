@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { api } from '@/lib/api';
@@ -42,6 +42,26 @@ describe('employee administration', () => {
     expect(call?.[1]?.body).toMatchObject({ username: 'nisha.kn', role: 'intern', branch: 'branch', is_active: true, can_receive_leads: false, password: 'Meadow!Window!Velvet!2026' });
     expect(call?.[1]?.body).not.toHaveProperty('is_superuser');
   });
+  it('keeps an employee draft open through dialog clicks and background refreshes', async () => {
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false }, mutations: { retry: false } } });
+    render(<QueryClientProvider client={client}><EmployeeAdmin /></QueryClientProvider>);
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Add employee' }));
+    const dialog = screen.getByRole('dialog', { name: 'Create employee account' });
+    await user.type(screen.getByLabelText('First name'), 'Nisha');
+    await user.type(screen.getByLabelText('Username'), 'nisha.kn');
+    fireEvent.click(dialog);
+    expect(dialog).toBeInTheDocument();
+    expect(dialog).toHaveAttribute('open');
+    expect(screen.getByLabelText('First name')).toHaveValue('Nisha');
+    await act(async () => { await client.invalidateQueries(); });
+    expect(screen.getByRole('dialog', { name: 'Create employee account' })).toHaveAttribute('open');
+    expect(screen.getByLabelText('Username')).toHaveValue('nisha.kn');
+    await user.click(screen.getByRole('button', { name: 'Close dialog' }));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(vi.mocked(api).mock.calls.some(([, options]) => options?.method === 'POST')).toBe(false);
+  });
+
   it('requires matching passwords before resetting an employee password', async () => {
     const close = vi.fn(); wrap(<EmployeePasswordForm employee={employee} close={close} />); const user = userEvent.setup();
     const update = screen.getByRole('button', { name: 'Update password' }); expect(update).toBeDisabled();

@@ -1398,6 +1398,22 @@ paths:
               schema:
                 $ref: '#/components/schemas/Demo'
           description: ''
+  /api/v1/education/preferred-branches/:
+    get:
+      operationId: education_preferred_branches_list
+      tags:
+      - education
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PreferredBranch'
+          description: ''
   /api/v1/education/qualifications/{lead_id}/:
     get:
       operationId: education_qualifications_retrieve
@@ -1764,6 +1780,38 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Lead'
+          description: ''
+  /api/v1/leads/intake/:
+    post:
+      operationId: leads_intake_create
+      tags:
+      - leads
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UnifiedEnquiryInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UnifiedEnquiryInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UnifiedEnquiryInput'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lead'
+          description: ''
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DuplicateReview'
           description: ''
   /api/v1/leads/{id}/:
     get:
@@ -2863,12 +2911,29 @@ paths:
     get:
       operationId: whatsapp_templates_list
       parameters:
+      - in: query
+        name: category
+        schema:
+          type: string
+        description: Comma-separated UTILITY, MARKETING, AUTHENTICATION or OTHER.
+          Omit for all categories.
+      - in: query
+        name: channel
+        schema:
+          type: string
+        description: Filter by business account UUID.
       - name: page
         required: false
         in: query
         description: A page number within the paginated result set.
         schema:
           type: integer
+      - in: query
+        name: status
+        schema:
+          type: string
+        description: 'Comma-separated approval statuses: APPROVED, PENDING, REJECTED,
+          PAUSED, DISABLED, IN_APPEAL, PENDING_DELETION, DELETED, MISSING or OTHER.'
       tags:
       - whatsapp
       security:
@@ -4331,6 +4396,10 @@ components:
       description: Reject spoofed read-only/unknown fields instead of silently ignoring
         them.
       properties:
+        qualification:
+          allOf:
+          - $ref: '#/components/schemas/Qualification'
+          nullable: true
         id:
           type: string
           format: uuid
@@ -4410,6 +4479,31 @@ components:
         can_edit:
           type: boolean
           readOnly: true
+        received_at:
+          type: string
+          format: date-time
+          readOnly: true
+        received_via:
+          type: string
+          readOnly: true
+        origin_branch:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+        origin_branch_name:
+          type: string
+          readOnly: true
+          nullable: true
+        origin_branch_code:
+          type: string
+          readOnly: true
+        origin_branch_verified:
+          type: boolean
+          readOnly: true
+        legacy_lead_id:
+          type: string
+          readOnly: true
       required:
       - acknowledged_at
       - acknowledgement_due_at
@@ -4422,7 +4516,14 @@ components:
       - created_by
       - id
       - lead_id
+      - legacy_lead_id
+      - origin_branch
+      - origin_branch_code
+      - origin_branch_name
+      - origin_branch_verified
       - owner_name
+      - received_at
+      - received_via
       - routing_attempts
       - title
       - updated_at
@@ -5418,6 +5519,10 @@ components:
       description: Reject spoofed read-only/unknown fields instead of silently ignoring
         them.
       properties:
+        qualification:
+          allOf:
+          - $ref: '#/components/schemas/Qualification'
+          nullable: true
         id:
           type: string
           format: uuid
@@ -5497,6 +5602,31 @@ components:
         can_edit:
           type: boolean
           readOnly: true
+        received_at:
+          type: string
+          format: date-time
+          readOnly: true
+        received_via:
+          type: string
+          readOnly: true
+        origin_branch:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+        origin_branch_name:
+          type: string
+          readOnly: true
+          nullable: true
+        origin_branch_code:
+          type: string
+          readOnly: true
+        origin_branch_verified:
+          type: boolean
+          readOnly: true
+        legacy_lead_id:
+          type: string
+          readOnly: true
     PatchedPolicy:
       type: object
       description: Reject spoofed read-only/unknown fields instead of silently ignoring
@@ -5532,6 +5662,23 @@ components:
         course_interest:
           type: string
           maxLength: 200
+        course_interests:
+          type: array
+          items:
+            type: string
+            maxLength: 200
+          maxItems: 20
+        city:
+          type: string
+          maxLength: 120
+        preferred_branch:
+          type: string
+          format: uuid
+          nullable: true
+        preferred_branch_name:
+          type: string
+          readOnly: true
+          nullable: true
         background:
           $ref: '#/components/schemas/BackgroundEnum'
         training_mode:
@@ -5720,6 +5867,23 @@ components:
         course_interest:
           type: string
           maxLength: 200
+        course_interests:
+          type: array
+          items:
+            type: string
+            maxLength: 200
+          maxItems: 20
+        city:
+          type: string
+          maxLength: 120
+        preferred_branch:
+          type: string
+          format: uuid
+          nullable: true
+        preferred_branch_name:
+          type: string
+          readOnly: true
+          nullable: true
         background:
           $ref: '#/components/schemas/BackgroundEnum'
         training_mode:
@@ -5748,6 +5912,7 @@ components:
       required:
       - lead
       - missing_fields
+      - preferred_branch_name
       - updated_at
     QueueStatusEnum:
       enum:
@@ -6363,6 +6528,9 @@ components:
         status:
           type: string
           readOnly: true
+        category:
+          type: string
+          readOnly: true
         body:
           type: string
           readOnly: true
@@ -6381,6 +6549,7 @@ components:
           readOnly: true
       required:
       - body
+      - category
       - channel
       - id
       - language
@@ -6608,6 +6777,195 @@ components:
       - code
       - connected
       - detail
+    CandidateInput:
+      type: object
+      description: Reject spoofed read-only/unknown fields instead of silently ignoring
+        them.
+      properties:
+        full_name:
+          type: string
+          maxLength: 200
+        mobile:
+          type: string
+          maxLength: 40
+        email:
+          type: string
+          format: email
+      required:
+      - full_name
+    UnifiedEnquiryInput:
+      type: object
+      description: Reject spoofed read-only/unknown fields instead of silently ignoring
+        them.
+      properties:
+        qualification:
+          allOf:
+          - $ref: '#/components/schemas/Qualification'
+          nullable: true
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        lead_id:
+          type: string
+          readOnly: true
+        contact:
+          type: string
+          format: uuid
+        branch:
+          type: string
+          format: uuid
+        owner:
+          type: string
+          format: uuid
+          nullable: true
+        title:
+          type: string
+          maxLength: 200
+        source:
+          $ref: '#/components/schemas/SourceEnum'
+        status:
+          $ref: '#/components/schemas/LeadStatusEnum'
+        next_action:
+          type: string
+          maxLength: 500
+        next_action_at:
+          type: string
+          format: date-time
+          nullable: true
+        no_followup_reason:
+          type: string
+          maxLength: 500
+        unassigned_reason:
+          type: string
+          maxLength: 500
+        created_by:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        assignment_version:
+          type: integer
+          readOnly: true
+        acknowledgement_due_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        acknowledged_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        routing_attempts:
+          type: integer
+          readOnly: true
+        contact_name:
+          type: string
+          readOnly: true
+        owner_name:
+          type: string
+          nullable: true
+          readOnly: true
+        branch_name:
+          type: string
+          readOnly: true
+        can_edit:
+          type: boolean
+          readOnly: true
+        received_at:
+          type: string
+          format: date-time
+          readOnly: true
+        received_via:
+          type: string
+          readOnly: true
+        origin_branch:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+        origin_branch_name:
+          type: string
+          readOnly: true
+          nullable: true
+        origin_branch_code:
+          type: string
+          readOnly: true
+        origin_branch_verified:
+          type: boolean
+          readOnly: true
+        legacy_lead_id:
+          type: string
+          readOnly: true
+        candidate:
+          allOf:
+          - $ref: '#/components/schemas/CandidateInput'
+          writeOnly: true
+      required:
+      - acknowledged_at
+      - acknowledgement_due_at
+      - assignment_version
+      - branch_name
+      - can_edit
+      - contact_name
+      - created_at
+      - created_by
+      - id
+      - lead_id
+      - legacy_lead_id
+      - origin_branch
+      - origin_branch_code
+      - origin_branch_name
+      - origin_branch_verified
+      - owner_name
+      - received_at
+      - received_via
+      - routing_attempts
+      - title
+      - updated_at
+    PreferredBranch:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          maxLength: 100
+      required:
+      - id
+      - name
+    TemplateSyncInput:
+      type: object
+      description: Reject spoofed read-only/unknown fields instead of silently ignoring
+        them.
+      properties:
+        channel:
+          type: string
+          format: uuid
+      required:
+      - channel
+    TemplateSyncResult:
+      type: object
+      properties:
+        count:
+          type: integer
+        synced_at:
+          type: string
+          format: date-time
+      required:
+      - count
+      - synced_at
   securitySchemes:
     cookieAuth:
       type: apiKey

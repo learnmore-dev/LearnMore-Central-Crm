@@ -9,14 +9,28 @@ from .models import Lead
 from . import services
 from common.identifiers import canonical_identifier_search
 from django.db.models import Q
+from django.db import transaction
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from drf_spectacular.utils import extend_schema
+from contacts.models import DuplicateReview
+from contacts.api import DuplicateReviewSerializer
+from education.api import QualificationSerializer
 
 
 class LeadSerializer(StrictInputMixin, serializers.ModelSerializer):
+    qualification = QualificationSerializer(required=False, allow_null=True)
     contact_name = serializers.CharField(source='contact.full_name', read_only=True)
     owner_name = serializers.SerializerMethodField()
     branch_name = serializers.CharField(source='branch.name', read_only=True)
     origin_branch_name = serializers.CharField(source='origin_branch.name', read_only=True, allow_null=True)
     can_edit = serializers.SerializerMethodField()
+
+    def to_representation(self, instance):
+        result = super().to_representation(instance)
+        if not self.get_can_edit(instance):
+            result.pop('qualification', None)
+        return result
 
     def get_owner_name(self, obj) -> str | None:
         return (obj.owner.get_full_name() or obj.owner.username) if obj.owner else None
@@ -34,7 +48,7 @@ class LeadSerializer(StrictInputMixin, serializers.ModelSerializer):
 
     class Meta:
         model = Lead
-        fields = ['id', 'lead_id', 'contact', 'branch', 'owner', 'title', 'source', 'status', 'next_action',
+        fields = ['qualification', 'id', 'lead_id', 'contact', 'branch', 'owner', 'title', 'source', 'status', 'next_action',
                   'next_action_at', 'no_followup_reason', 'unassigned_reason', 'created_by', 'created_at', 'updated_at',
                   'assignment_version', 'acknowledgement_due_at', 'acknowledged_at', 'routing_attempts',
                   'contact_name', 'owner_name', 'branch_name', 'can_edit', 'received_at', 'received_via',
@@ -61,13 +75,76 @@ class LeadSerializer(StrictInputMixin, serializers.ModelSerializer):
             attrs['branch'] = attrs.get('branch') or self.context['request'].user.branch
             if attrs['branch'] is None:
                 raise serializers.ValidationError({'branch': 'Choose an active branch.'})
+        primary = (attrs.get('qualification') or {}).get('course_interest')
+        if primary:
+            if 'title' in attrs and attrs['title'] != primary:
+                raise serializers.ValidationError({'title': 'The enquiry course must match the primary course interest.'})
+            attrs['title'] = primary
+        interests = (attrs.get('qualification') or {}).get('course_interests')
+        effective_primary = primary or attrs.get('title') or (self.instance.title if self.instance else '')
+        if interests is not None and effective_primary not in interests:
+            raise serializers.ValidationError({'qualification': 'The primary course must be one of the selected interests.'})
         return attrs
 
+    @transaction.atomic
     def create(self, validated_data):
-        return services.create_lead(actor=self.context['request'].user, **validated_data)
+        qualification = validated_data.pop('qualification', None)
+        lead = services.create_lead(actor=self.context['request'].user, **validated_data)
+        if qualification is not None:
+            from education.services import save_qualification
+            save_qualification(self.context['request'].user, lead, qualification, initial=True)
+        return lead
 
+    @transaction.atomic
     def update(self, instance, validated_data):
-        return services.update_lead(actor=self.context['request'].user, lead=instance, **validated_data)
+        qualification = validated_data.pop('qualification', None)
+        lead = services.update_lead(actor=self.context['request'].user, lead=instance, **validated_data)
+        if qualification is not None:
+            from education.services import save_qualification
+            save_qualification(self.context['request'].user, lead, qualification)
+        return lead
+
+
+class CandidateInput(StrictInputMixin, serializers.Serializer):
+    full_name = serializers.CharField(max_length=200)
+    mobile = serializers.CharField(max_length=40, required=False, allow_blank=True)
+    email = serializers.EmailField(required=False, allow_blank=True)
+
+    def validate(self, attrs):
+        if not attrs.get('mobile') and not attrs.get('email'):
+            raise serializers.ValidationError('Supply a mobile number or email address.')
+        return attrs
+
+
+class UnifiedEnquiryInput(LeadSerializer):
+    candidate = CandidateInput(required=False, write_only=True)
+    contact = serializers.PrimaryKeyRelatedField(queryset=Contact.objects.none(), required=False)
+
+    class Meta(LeadSerializer.Meta):
+        fields = [*LeadSerializer.Meta.fields, 'candidate']
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        if ('candidate' in attrs) == ('contact' in attrs):
+            raise serializers.ValidationError('Choose an existing contact or supply new candidate details, not both.')
+        return attrs
+
+    @transaction.atomic
+    def create(self, validated_data):
+        candidate = validated_data.pop('candidate', None)
+        if candidate:
+            from contacts.services import create_contact
+            identifiers = []
+            if candidate.get('mobile'):
+                identifiers.append({'kind': 'phone', 'value': candidate['mobile']})
+            if candidate.get('email'):
+                identifiers.append({'kind': 'email', 'value': candidate['email']})
+            contact = create_contact(actor=self.context['request'].user, full_name=candidate['full_name'],
+                branch=validated_data['branch'], source=validated_data.get('source', 'manual'), identifiers=identifiers)
+            if isinstance(contact, DuplicateReview):
+                return contact
+            validated_data['contact'] = contact
+        return super().create(validated_data)
 
 
 class LeadViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.CreateModelMixin,
@@ -75,8 +152,18 @@ class LeadViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.Creat
     serializer_class = LeadSerializer
     permission_classes = [CRMRecordPermissions]
 
+    @extend_schema(request=UnifiedEnquiryInput, responses={201: LeadSerializer, 409: DuplicateReviewSerializer})
+    @action(detail=False, methods=['post'], url_path='intake')
+    def intake(self, request):
+        serializer = UnifiedEnquiryInput(data=request.data, context=self.get_serializer_context())
+        serializer.is_valid(raise_exception=True)
+        result = serializer.save()
+        if isinstance(result, DuplicateReview):
+            return Response(DuplicateReviewSerializer(result, context=self.get_serializer_context()).data, status=409)
+        return Response(LeadSerializer(result, context=self.get_serializer_context()).data, status=201)
+
     def get_queryset(self):
-        queryset = branch_scope(Lead.objects.select_related('contact', 'branch', 'owner', 'origin_branch'), self.request.user)
+        queryset = branch_scope(Lead.objects.select_related('contact', 'branch', 'owner', 'origin_branch', 'qualification__preferred_branch'), self.request.user)
         if search := self.request.query_params.get('search', '').strip():
             search = canonical_identifier_search(search)
             queryset = queryset.filter(Q(lead_id__icontains=search) | Q(legacy_lead_id__icontains=search) | Q(title__icontains=search) | Q(contact__full_name__icontains=search))
